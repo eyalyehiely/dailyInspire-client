@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const DeleteAccount = ({ token, onLogout }) => {
+  const VITE_BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

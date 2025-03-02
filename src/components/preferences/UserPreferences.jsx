@@ -3,6 +3,7 @@ import axios from "axios";
 import { User, Clock, Globe, Bell, Save, X, Edit } from "lucide-react";
 
 const UserPreferences = () => {
+  const VITE_BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
