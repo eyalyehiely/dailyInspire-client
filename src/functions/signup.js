@@ -1,8 +1,9 @@
 export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
-    const BASE_API=import.meta.env.BASE_API
+    const BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
     try {
         // First validate again on client side
-        if (!formData.full_name || !formData.email || !formData.password || !formData.confirmPassword) {
+        if (!formData.first_name || !formData.last_name || !formData.email || 
+            !formData.password || !formData.confirmPassword) {
             throw new Error("All fields are required");
         }
         
@@ -14,23 +15,24 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
             throw new Error("Password must be at least 6 characters");
         }
         
-        // Prepare the data for your API
+        // Prepare the data for your API - sending first_name and last_name separately
         const userData = {
-            full_name: formData.full_name,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
             email: formData.email,
             password: formData.password,
             notificationTime: formData.notificationTime,
             timeZone: formData.timeZone
         };
 
-    // Make the API call to your backend
-    const response = await fetch(`${BASE_API}/quotes/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+        // Make the API call to your backend
+        const response = await fetch(`${BASE_API}/quotes/signup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+        });
         
         const data = await response.json();
         
