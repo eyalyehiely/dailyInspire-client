@@ -1,5 +1,5 @@
 export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
-    const BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
+    const VITE_BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
     try {
         // First validate again on client side
         if (!formData.first_name || !formData.last_name || !formData.email || 
@@ -26,7 +26,7 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         };
 
         // Make the API call to your backend
-        const response = await fetch(`${BASE_API}/quotes/signup`, {
+        const response = await fetch(`${VITE_BASE_API}/quotes/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -28,7 +28,7 @@ const DeleteAccount = ({ token, onLogout }) => {
 
     setIsLoading(true);
     try {
-      await axios.delete(`${BASE_API}/auth/delete-account`, {
+      await axios.delete(`${VITE_BASE_API}/auth/delete-account`, {
         headers: {
           'Content-Type': 'application/json',
           'x-auth-token': token

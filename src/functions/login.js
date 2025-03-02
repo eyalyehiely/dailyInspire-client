@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export const login = async (formData) => {
-    const BASE_API=import.meta.env.BASE_API
+    const VITE_BASE_API=import.meta.env.VITE_BASE_API
     try {
-        const response = await axios.post(`${BASE_API}/auth/login`, 
+        const response = await axios.post(`${VITE_BASE_API}/auth/login`, 
             {
                 email: formData.email,
                 password: formData.password

@@ -47,7 +47,7 @@ const UserPreferences = () => {
         const token = authTokens.token;
 
         const response = await axios.get(
-          `${BASE_API}/auth/preferences`,
+          `${VITE_BASE_API}/auth/preferences`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
