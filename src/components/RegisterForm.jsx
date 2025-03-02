@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { signup } from "../functions/signup";
 import Header from "./General/Header";
+import { Link } from "react-router-dom";
+
 const RegisterForm = ({ onLoginClick }) => {
   const supportedTimeZones = Intl.supportedValuesOf("timeZone");
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
