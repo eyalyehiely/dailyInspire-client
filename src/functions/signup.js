@@ -21,7 +21,7 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
             last_name: formData.last_name,
             email: formData.email,
             password: formData.password,
-            notificationTime: formData.notificationTime,
+            preferredTime: formData.preferredTime,
             timeZone: formData.timeZone
         };
 
