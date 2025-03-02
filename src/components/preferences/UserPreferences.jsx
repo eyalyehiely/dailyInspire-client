@@ -18,21 +18,8 @@ const UserPreferences = () => {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const timezones = [
-    { value: "America/New_York", label: "Eastern Time (ET)" },
-    { value: "America/Chicago", label: "Central Time (CT)" },
-    { value: "America/Denver", label: "Mountain Time (MT)" },
-    { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
-    { value: "America/Anchorage", label: "Alaska Time (AKT)" },
-    { value: "Pacific/Honolulu", label: "Hawaii Time (HT)" },
-    { value: "Europe/London", label: "Greenwich Mean Time (GMT)" },
-    { value: "Europe/Paris", label: "Central European Time (CET)" },
-    { value: "Asia/Tokyo", label: "Japan Standard Time (JST)" },
-    { value: "Asia/Shanghai", label: "China Standard Time (CST)" },
-    { value: "Asia/Kolkata", label: "India Standard Time (IST)" },
-    { value: "Australia/Sydney", label: "Australian Eastern Time (AET)" },
-    { value: "Asia/Jerusalem", label: "Israel Standard Time (IST)" },
-  ];
+  const timezones = Intl.supportedValuesOf("timeZone");
+
 
   useEffect(() => {
     const fetchPreferences = async () => {
