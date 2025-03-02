@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { signup } from "../functions/signup";
+import Header from "./General/Header";
 const RegisterForm = ({ onLoginClick }) => {
   const supportedTimeZones = Intl.supportedValuesOf("timeZone");
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -137,6 +138,8 @@ const RegisterForm = ({ onLoginClick }) => {
   }
 
   return (
+    <>
+    <Header/>
     <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10 border-t-4 border-indigo-500 transform transition-all duration-300 hover:shadow-2xl">
       <h2 className="mb-6 text-center text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
         Register for DailyInspire
@@ -389,6 +392,7 @@ const RegisterForm = ({ onLoginClick }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
