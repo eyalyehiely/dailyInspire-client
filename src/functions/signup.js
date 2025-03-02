@@ -3,7 +3,7 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
     try {
         // First validate again on client side
         if (!formData.first_name || !formData.last_name || !formData.email || 
-            !formData.password || !formData.confirmPassword) {
+            !formData.password || !formData.confirmPassword || !formData.preferredTime || formData.timeZone) {
             throw new Error("All fields are required");
         }
         

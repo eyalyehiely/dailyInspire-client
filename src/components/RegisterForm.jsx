@@ -14,7 +14,7 @@ const RegisterForm = ({ onLoginClick }) => {
     email: "",
     password: "",
     confirmPassword: "",
-    notificationTime: "08:00",
+    preferredTime: "08:00",
     termsAccepted: false,
     timeZone: userTimeZone,
   });
@@ -299,7 +299,7 @@ const RegisterForm = ({ onLoginClick }) => {
 
         <div>
           <label
-            htmlFor="notificationTime"
+            htmlFor="preferredTime"
             className="block text-sm font-medium text-gray-700"
           >
             When would you like to receive your daily quote?
@@ -307,9 +307,9 @@ const RegisterForm = ({ onLoginClick }) => {
           <div className="mt-1">
             <input
               type="time"
-              id="notificationTime"
-              name="notificationTime"
-              value={formData.notificationTime}
+              id="preferredTime"
+              name="preferredTime"
+              value={formData.preferredTime}
               onChange={handleChange}
               className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
