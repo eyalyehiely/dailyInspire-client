@@ -1,0 +1,41 @@
+<head>
+  <!-- Other head elements -->
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Server routing script -->
+  <script>
+    // Simple server-side routing simulation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get all non-external links
+      const internalLinks = document.querySelectorAll('a:not([href^="http"])');
+      
+      internalLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          
+          // Skip if it's a download link or has target="_blank"
+          if (this.hasAttribute('download') || this.getAttribute('target') === '_blank') {
+            return;
+          }
+          
+          // Prevent default link behavior
+          e.preventDefault();
+          
+          // Update URL without page reload
+          window.history.pushState({}, '', href);
+          
+          // Trigger a popstate event to handle the navigation
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        });
+      });
+    });
+    
+    // Handle back/forward navigation
+    window.addEventListener('popstate', function() {
+      // Force reload the page to simulate traditional navigation
+      window.location.reload();
+    });
+  </script>
+</head> 
