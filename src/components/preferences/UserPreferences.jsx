@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { User, Clock, Globe, Bell, Save, X, Edit } from "lucide-react";
+import Header from "../General/Header";
+
 
 const UserPreferences = () => {
   const VITE_BASE_API = import.meta.env.VITE_BASE_API || 'http://localhost:3000/api';
@@ -117,6 +119,8 @@ const UserPreferences = () => {
   }
 
   return (
+    <>
+    <Header/>
     <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border-t-4 border-indigo-500">
         <div className="px-6 py-5 bg-gradient-to-r from-indigo-50 to-purple-50">
@@ -373,6 +377,7 @@ const UserPreferences = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

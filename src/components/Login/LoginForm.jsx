@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { login } from "../../functions/login";
 import { Link } from "react-router-dom";
+import Header from "../General/Header";
 
 const LoginForm = ({ onRegisterClick, onLoginSuccess = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -98,6 +99,8 @@ const LoginForm = ({ onRegisterClick, onLoginSuccess = () => {} }) => {
   };
 
   return (
+    <>
+    <Header/>
     <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10 border-t-4 border-purple-500 transform transition-all duration-300 hover:shadow-2xl">
       <h2 className="mb-6 text-center text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
         Login to DailyInspire
@@ -237,6 +240,8 @@ const LoginForm = ({ onRegisterClick, onLoginSuccess = () => {} }) => {
         </div>
       </div>
     </div>
+    </>
+
   );
 };
 
