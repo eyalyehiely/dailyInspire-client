@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 export const login = async (formData) => {
+    const BASE_API=import.meta.env.BASE_API
     try {
-        const response = await axios.post('http://localhost:3000/api/auth/login', 
+        const response = await axios.post(`${BASE_API}/auth/login`, 
             {
                 email: formData.email,
                 password: formData.password

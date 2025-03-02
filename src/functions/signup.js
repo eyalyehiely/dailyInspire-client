@@ -1,6 +1,5 @@
-import axios from 'axios';
-
 export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
+    const BASE_API=import.meta.env.BASE_API
     try {
         // First validate again on client side
         if (!formData.full_name || !formData.email || !formData.password || !formData.confirmPassword) {
@@ -25,7 +24,7 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         };
 
     // Make the API call to your backend
-    const response = await fetch("http://localhost:3000/api/quotes/signup", {
+    const response = await fetch(`${BASE_API}/quotes/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

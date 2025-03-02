@@ -47,7 +47,7 @@ const UserPreferences = () => {
         const token = authTokens.token;
 
         const response = await axios.get(
-          "http://localhost:3000/api/auth/preferences",
+          `${BASE_API}/auth/preferences`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
