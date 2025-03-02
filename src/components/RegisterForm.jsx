@@ -121,14 +121,16 @@ const RegisterForm = ({ onLoginClick }) => {
           inspirational quotes at your selected time.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            onClick={onLoginClick}
+          <Link to="/login">
+            <button
+              type="button"
+              onClick={onLoginClick}
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 transition-all duration-200"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
             Go to login
           </button>
+          </Link>
         </div>
       </div>
     );
