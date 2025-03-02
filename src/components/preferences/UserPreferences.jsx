@@ -121,7 +121,7 @@ const UserPreferences = () => {
   return (
     <>
     <Header/>
-    <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 mt-4">
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border-t-4 border-indigo-500">
         <div className="px-6 py-5 bg-gradient-to-r from-indigo-50 to-purple-50">
           <h2 className="text-2xl font-bold text-gray-800">Your Preferences</h2>
