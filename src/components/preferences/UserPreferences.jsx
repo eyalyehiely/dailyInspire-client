@@ -319,14 +319,14 @@ const UserPreferences = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
                       {timezones.map((tz) => (
-                        <option key={tz.value} value={tz.value}>
-                          {tz.label}
+                        <option key={tz} value={tz}>
+                          {tz}
                         </option>
                       ))}
                     </select>
                   ) : (
                     <div className="mt-1 bg-gray-50 rounded-md px-3 py-2 text-gray-600">
-                      {timezones.find((tz) => tz.value === formData.timezone)
+                      {timezones.find((tz) => tz === formData.timezone)
                         ?.label ||
                         formData.timezone ||
                         "Not set"}
