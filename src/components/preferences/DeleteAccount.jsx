@@ -48,7 +48,7 @@ const DeleteAccount = ({ token, onLogout }) => {
     setIsLoading(true);
     try {
       await axios.post(
-        `${VITE_BASE_API}/delete-account`,
+        `${VITE_BASE_API}/auth/delete-account`,
         {
           email: user.email,
           password: password,

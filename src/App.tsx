@@ -11,6 +11,10 @@ import Home from "./components/Home/Home.jsx";
 import UserPreferences from "./components/preferences/UserPreferences";
 import AccountDeleted from "./components/preferences/AccountDeleted";
 
+// Auth:
+import ForgotPassword from "./components/Login/ForgotPassword.jsx";
+import ResetPassword from "./components/Login/ResetPassword.jsx";
+
 // Payment Flow:
 import PaymentPage from "./components/Payment/PaymentPage.jsx";
 import PaymentSuccess from "./components/Payment/PaymentSuccess.jsx";
@@ -55,6 +59,28 @@ function App() {
             </>
           }
         />
+        
+        {/* Password Reset Routes */}
+        <Route
+          path="/forgot-password"
+          element={
+            <>
+              <PageTitle title="Forgot Password | DailyInspire" />
+              <ForgotPassword />
+            </>
+          }
+        />
+        
+        <Route
+          path="/reset-password/:token"
+          element={
+            <>
+              <PageTitle title="Reset Password | DailyInspire" />
+              <ResetPassword />
+            </>
+          }
+        />
+        
         <Route
             path="/"
             element={

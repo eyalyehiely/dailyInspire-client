@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Mail, Lock, User, ArrowLeft } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  User,
+  ArrowLeft,
+  UserPlus,
+  Clock,
+  Globe,
+} from "lucide-react";
 import { signup } from "../functions/signup";
 import Header from "./General/Header";
 import { Link, useNavigate } from "react-router-dom";
@@ -101,260 +109,325 @@ const RegisterForm = ({ onLoginClick }) => {
   return (
     <>
       <Header />
-      <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10 border-t-4 border-indigo-500 transform transition-all duration-300 hover:shadow-2xl mt-4">
-        <h2 className="mb-6 text-center text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-          Register for DailyInspire
-        </h2>
-
-        {apiError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-            <p>{apiError}</p>
-          </div>
-        )}
-
-        <form className="mb-0 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="first_name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              First Name
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-indigo-500" />
-              </div>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.first_name
-                    ? "border-red-300 ring-1 ring-red-300"
-                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
-                placeholder="John"
-              />
-            </div>
-            {errors.first_name && (
-              <p className="mt-2 text-sm text-red-600">{errors.first_name}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="last_name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Last Name
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-indigo-500" />
-              </div>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.last_name
-                    ? "border-red-300 ring-1 ring-red-300"
-                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
-                placeholder="Doe"
-              />
-            </div>
-            {errors.last_name && (
-              <p className="mt-2 text-sm text-red-600">{errors.last_name}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email address
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-indigo-500" />
-              </div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.email
-                    ? "border-red-300 ring-1 ring-red-300"
-                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
-                placeholder="you@example.com"
-              />
-            </div>
-            {errors.email && (
-              <p className="mt-2 text-sm text-red-600">{errors.email}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-indigo-500" />
-              </div>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.password
-                    ? "border-red-300 ring-1 ring-red-300"
-                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
-              />
-            </div>
-            {errors.password && (
-              <p className="mt-2 text-sm text-red-600">{errors.password}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Confirm Password
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-indigo-500" />
-              </div>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.confirmPassword
-                    ? "border-red-300 ring-1 ring-red-300"
-                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
-              />
-            </div>
-            {errors.confirmPassword && (
-              <p className="mt-2 text-sm text-red-600">
-                {errors.confirmPassword}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="preferredTime"
-              className="block text-sm font-medium text-gray-700"
-            >
-              When would you like to receive your daily quote?
-            </label>
-            <div className="mt-1">
-              <input
-                type="time"
-                id="preferredTime"
-                name="preferredTime"
-                value={formData.preferredTime}
-                onChange={handleChange}
-                className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                Time is based on your selected time zone: {formData.timeZone}
-              </p>
+      <div className="max-w-lg mx-auto mt-8 mb-12">
+        <div className="bg-white py-10 px-8 shadow-2xl rounded-xl border-t-4 border-indigo-500 transform transition-all duration-300 hover:shadow-2xl animate-fadeIn">
+          <div className="flex justify-center mb-6">
+            <div className="h-16 w-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+              <UserPlus className="h-8 w-8 text-white" />
             </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="timeZone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Time Zone
-            </label>
-            <div className="mt-1">
-              <select
-                id="timeZone"
-                name="timeZone"
-                value={formData.timeZone}
-                onChange={handleChange}
-                className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                {supportedTimeZones.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <h2 className="mb-8 text-center text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+            Create Your Account
+          </h2>
 
-          <div className="flex items-center">
-            <input
-              id="termsAccepted"
-              name="termsAccepted"
-              type="checkbox"
-              checked={formData.termsAccepted}
-              onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="termsAccepted"
-              className="ml-2 block text-sm text-gray-900"
-            >
-              I agree to the{" "}
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-500 font-medium"
-              >
-                Terms and Conditions
-              </a>{" "}
-              and{" "}
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-500 font-medium"
-              >
-                Privacy Policy
-              </a>
-            </label>
-          </div>
-          {errors.termsAccepted && (
-            <p className="mt-2 text-sm text-red-600">{errors.termsAccepted}</p>
+          {apiError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+              <ArrowLeft className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-600">{apiError}</p>
+            </div>
           )}
 
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 transition-all duration-200 ${
-                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? "Registering..." : "Register"}
-            </button>
+          <form className="mb-0 space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label
+                  htmlFor="first_name"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  First Name
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-indigo-500" />
+                  </div>
+                  <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    className={`block w-full pl-10 pr-3 py-3 border ${
+                      errors.first_name
+                        ? "border-red-300 ring-1 ring-red-300"
+                        : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                    placeholder="John"
+                  />
+                </div>
+                {errors.first_name && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.first_name}
+                  </p>
+                )}
+              </div>
+
+              <div className="group">
+                <label
+                  htmlFor="last_name"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Last Name
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-indigo-500" />
+                  </div>
+                  <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    className={`block w-full pl-10 pr-3 py-3 border ${
+                      errors.last_name
+                        ? "border-red-300 ring-1 ring-red-300"
+                        : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                    placeholder="Doe"
+                  />
+                </div>
+                {errors.last_name && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.last_name}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="group">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Email address
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-indigo-500" />
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`block w-full pl-10 pr-3 py-3 border ${
+                    errors.email
+                      ? "border-red-300 ring-1 ring-red-300"
+                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                  } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                  placeholder="you@example.com"
+                />
+              </div>
+              {errors.email && (
+                <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-indigo-500" />
+                  </div>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`block w-full pl-10 pr-3 py-3 border ${
+                      errors.password
+                        ? "border-red-300 ring-1 ring-red-300"
+                        : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                    placeholder="••••••••"
+                  />
+                </div>
+                {errors.password && (
+                  <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                )}
+              </div>
+
+              <div className="group">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-indigo-500" />
+                  </div>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={`block w-full pl-10 pr-3 py-3 border ${
+                      errors.confirmPassword
+                        ? "border-red-300 ring-1 ring-red-300"
+                        : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                    placeholder="••••••••"
+                  />
+                </div>
+                {errors.confirmPassword && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="group">
+              <label
+                htmlFor="preferredTime"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Preferred Time for Daily Quote
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Clock className="h-5 w-5 text-indigo-500" />
+                </div>
+                <input
+                  type="time"
+                  id="preferredTime"
+                  name="preferredTime"
+                  value={formData.preferredTime}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            <div className="group">
+              <label
+                htmlFor="timeZone"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Your Time Zone
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Globe className="h-5 w-5 text-indigo-500" />
+                </div>
+                <select
+                  id="timeZone"
+                  name="timeZone"
+                  value={formData.timeZone}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                >
+                  {supportedTimeZones.map((tz) => (
+                    <option key={tz} value={tz}>
+                      {tz}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="termsAccepted"
+                name="termsAccepted"
+                type="checkbox"
+                checked={formData.termsAccepted}
+                onChange={handleChange}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="termsAccepted"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                I accept the{" "}
+                <Link
+                  to="/terms-of-service"
+                  className="text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/privacy-policy"
+                  className="text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                >
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+            {errors.termsAccepted && (
+              <p className="mt-2 text-sm text-red-600">
+                {errors.termsAccepted}
+              </p>
+            )}
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:translate-y-[-2px] transition-all duration-200 ${
+                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSubmitting ? "Signing Up..." : "Sign Up"}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Already have an account?
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Link to="/login">
+                <button
+                  onClick={onLoginClick}
+                  className="w-full flex justify-center items-center py-3 px-4 border border-indigo-300 rounded-lg shadow-sm text-base font-medium text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                >
+                  <ArrowLeft className="mr-2 h-5 w-5" />
+                  Back to Login
+                </button>
+              </Link>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+      `}</style>
     </>
   );
 };
