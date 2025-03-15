@@ -18,22 +18,22 @@ const features = [
     color: 'from-purple-500 to-purple-600',
     bgColor: 'bg-purple-50',
   },
-  {
-    name: 'Instant Mood Boost',
-    description:
-      'Feeling down? Access our quote library anytime for an instant dose of inspiration and encouragement.',
-    icon: Zap,
-    color: 'from-yellow-500 to-orange-500',
-    bgColor: 'bg-yellow-50',
-  },
-  {
-    name: 'Save Favorites',
-    description:
-      'Save your favorite quotes to revisit them whenever you need that specific piece of wisdom.',
-    icon: Heart,
-    color: 'from-red-500 to-red-600',
-    bgColor: 'bg-red-50',
-  },
+  // {
+  //   name: 'Instant Mood Boost',
+  //   description:
+  //     'Feeling down? Access our quote library anytime for an instant dose of inspiration and encouragement.',
+  //   icon: Zap,
+  //   color: 'from-yellow-500 to-orange-500',
+  //   bgColor: 'bg-yellow-50',
+  // },
+  // {
+  //   name: 'Save Favorites',
+  //   description:
+  //     'Save your favorite quotes to revisit them whenever you need that specific piece of wisdom.',
+  //   icon: Heart,
+  //   color: 'from-red-500 to-red-600',
+  //   bgColor: 'bg-red-50',
+  // },
 ];
 
 const FeatureSection = () => {

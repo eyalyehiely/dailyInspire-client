@@ -1,5 +1,6 @@
-import React from 'react';
-import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Instagram, Twitter, Facebook, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -9,13 +10,15 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center">
               <div className="flex items-center">
-                <span className="text-white text-xl font-bold">DailyInspire</span>
+                <span className="text-white text-xl font-bold">
+                  DailyInspire
+                </span>
               </div>
             </div>
             <p className="mt-2 text-base text-gray-300">
-              Start your day with positivity and motivation. Our daily inspirational quotes are carefully selected to help you achieve your goals and maintain a positive mindset.
+              Start your day with positivity and motivation.
             </p>
-            <div className="mt-4 flex space-x-6">
+            {/* <div className="mt-4 flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-pink-400 transition-colors duration-200">
                 <span className="sr-only">Instagram</span>
                 <Instagram className="h-6 w-6" />
@@ -32,36 +35,75 @@ const Footer = () => {
                 <span className="sr-only">Email</span>
                 <Mail className="h-6 w-6" />
               </a>
-            </div>
+            </div> */}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+              Company
+            </h3>
             <ul className="mt-4 space-y-4">
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">About</a>
+                <a
+                  href="#"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  About
+                </a>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Blog</a>
+                <a
+                  href="#"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Blog
+                </a>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Careers</a>
+                <a
+                  href="#"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Careers
+                </a>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Contact</a>
+                <a
+                  href="#"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Contact
+                </a>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Legal</h3>
+            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+              Legal
+            </h3>
             <ul className="mt-4 space-y-4">
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Privacy Policy</a>
+                <Link
+                  to="/privacy-policy"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Terms of Service</a>
+                <Link
+                  to="/terms-of-service"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Terms of Service
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-300 hover:text-white transition-colors duration-200">Cookie Policy</a>
+                <Link
+                  to="/cookie-policy"
+                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  Cookie Policy
+                </Link>
               </li>
             </ul>
           </div>

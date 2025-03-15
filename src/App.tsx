@@ -11,6 +11,15 @@ import Home from "./components/Home/Home.jsx";
 import UserPreferences from "./components/preferences/UserPreferences";
 import AccountDeleted from "./components/preferences/AccountDeleted";
 
+// Payment Flow:
+import PaymentPage from "./components/Payment/PaymentPage.jsx";
+import PaymentSuccess from "./components/Payment/PaymentSuccess.jsx";
+
+// Legal Pages:
+import PrivacyPolicy from "./components/Legal/PrivacyPolicy";
+import TermsOfService from "./components/Legal/TermsOfService";
+import CookiePolicy from "./components/Legal/CookiePolicy";
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
@@ -62,6 +71,58 @@ function App() {
             <>
               <PageTitle title="Account Deleted | DailyInspire" />
               <AccountDeleted />
+            </>
+          }
+        />
+
+        {/* Payment Flow Routes */}
+        <Route
+          path="/payment"
+          element={
+            <>
+              <PageTitle title="Subscribe | DailyInspire" />
+              <PaymentPage />
+            </>
+          }
+        />
+        
+        <Route
+          path="/payment-success"
+          element={
+            <>
+              <PageTitle title="Payment Successful | DailyInspire" />
+              <PaymentSuccess />
+            </>
+          }
+        />
+
+        {/* Legal Routes */}
+        <Route
+          path="/privacy-policy"
+          element={
+            <>
+              <PageTitle title="Privacy Policy | DailyInspire" />
+              <PrivacyPolicy />
+            </>
+          }
+        />
+
+        <Route
+          path="/terms-of-service"
+          element={
+            <>
+              <PageTitle title="Terms of Service | DailyInspire" />
+              <TermsOfService />
+            </>
+          }
+        />
+
+        <Route
+          path="/cookie-policy"
+          element={
+            <>
+              <PageTitle title="Cookie Policy | DailyInspire" />
+              <CookiePolicy />
             </>
           }
         />

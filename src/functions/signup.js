@@ -41,14 +41,26 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         }
         
         // If successful
-        setIsSuccess(true);
+        if (setIsSuccess) {
+            setIsSuccess(true);
+        }
+        
+        // Store user data and token in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.token) {
+            localStorage.setItem('authToken', data.token);
+        }
+        
+        // Return user data so we can pass it to the payment page
+        return data.user;
         
     } catch (error) {
         console.error("Signup error:", error);
         throw error; // Re-throw to be handled by the component
     } finally {
-        setIsSubmitting(false);
+        if (setIsSubmitting) {
+            setIsSubmitting(false);
+        }
     }
 };
 

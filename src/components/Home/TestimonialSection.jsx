@@ -48,7 +48,6 @@ const TestimonialSection = () => {
               >
                 <div className={`flex-1 bg-white p-6 flex flex-col justify-between border-t-4 bg-gradient-to-r ${testimonial.color}`}>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-indigo-600">Testimonial</p>
                     <div className="block mt-2">
                       <p className="text-xl font-semibold text-gray-900">"{testimonial.content}"</p>
                     </div>
@@ -59,7 +58,7 @@ const TestimonialSection = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">{testimonial.author}</p>
-                      <div className="flex space-x-1 text-sm text-gray-500">
+                      <div className="flex space-x-1 text-sm text-gray-800">
                         <p>{testimonial.role}</p>
                       </div>
                     </div>
