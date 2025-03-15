@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Trash2, AlertOctagon } from "lucide-react";
@@ -10,7 +10,16 @@ const DeleteAccount = ({ token, onLogout }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const handleDeleteRequest = () => {
     setShowConfirmation(true);
@@ -26,6 +35,13 @@ const DeleteAccount = ({ token, onLogout }) => {
   const confirmDelete = async () => {
     if (!password) {
       setError("Please enter your password to confirm deletion");
+      return;
+    }
+
+    if (!user || !user.email) {
+      setError(
+        "User information is not available. Please try logging in again."
+      );
       return;
     }
 
