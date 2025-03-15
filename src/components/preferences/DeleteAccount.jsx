@@ -45,6 +45,13 @@ const DeleteAccount = ({ token, onLogout }) => {
       return;
     }
 
+    if (!token) {
+      setError("Authentication token is missing. Please try logging in again.");
+      return;
+    }
+
+    console.log("Token being used:", token.substring(0, 15) + "..."); // Log part of the token for debugging
+
     setIsLoading(true);
     try {
       await axios.post(
@@ -56,7 +63,7 @@ const DeleteAccount = ({ token, onLogout }) => {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-auth-token": token,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
