@@ -47,14 +47,20 @@ const DeleteAccount = ({ token, onLogout }) => {
 
     setIsLoading(true);
     try {
-      await axios.post(`${VITE_BASE_API}/manage-user`, {
-        email: user.email,
-        action: "delete",
-        headers: {
-          "Content-Type": "application/json",
-          "x-auth-token": token,
+      await axios.post(
+        `${VITE_BASE_API}/delete-account`,
+        {
+          email: user.email,
+          password: password,
+          action: "delete",
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
 
       // Account deleted successfully
       onLogout(); // Call the logout function to clear user data
