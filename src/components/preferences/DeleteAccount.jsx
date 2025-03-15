@@ -52,7 +52,6 @@ const DeleteAccount = ({ token, onLogout }) => {
         {
           email: user.email,
           password: password,
-          action: "delete",
         },
         {
           headers: {
