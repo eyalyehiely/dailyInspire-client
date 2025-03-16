@@ -73,16 +73,27 @@ function ContactForm() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Error parsing JSON response:", jsonError);
+        throw new Error(
+          "Server returned an invalid response. Please try again later."
+        );
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(data?.message || "Something went wrong");
       }
 
       setSuccess(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (err) {
-      setError(err.message);
+      console.error("Contact form error:", err);
+      setError(
+        err.message || "An unexpected error occurred. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
