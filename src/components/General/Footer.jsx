@@ -58,22 +58,7 @@ const Footer = () => {
                   Blog
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
-                >
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-300 hover:text-white transition-colors duration-200"
-                >
-                  Contact
-                </a>
-              </li>
+
             </ul>
           </div>
           <div>
