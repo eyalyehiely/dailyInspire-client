@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import {
+  Menu,
+  X,
+  User,
+  Info,
+  BookOpen,
+  Home,
+  Sparkles,
+  Star,
+  LogIn,
+  UserPlus,
+  LogOut,
+} from "lucide-react";
 import LogoutButton from "./LogoutButton";
 
 const Header = () => {
@@ -38,9 +50,26 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
             >
+              <Home className="h-4 w-4 mr-1" />
               Home
+            </Link>
+
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+            >
+              <Info className="h-4 w-4 mr-1" />
+              About
+            </Link>
+
+            <Link
+              to="/blog"
+              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+            >
+              <BookOpen className="h-4 w-4 mr-1" />
+              Blog
             </Link>
 
             {/* Show these links only if not logged in */}
@@ -48,26 +77,30 @@ const Header = () => {
               <>
                 <a
                   href="#features"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
                 >
+                  <Sparkles className="h-4 w-4 mr-1" />
                   Features
                 </a>
                 <a
                   href="#testimonials"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
                 >
+                  <Star className="h-4 w-4 mr-1" />
                   Testimonials
                 </a>
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
                 >
+                  <LogIn className="h-4 w-4 mr-1" />
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center"
                 >
+                  <UserPlus className="h-4 w-4 mr-1" />
                   Register
                 </Link>
               </>
@@ -108,10 +141,29 @@ const Header = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
             <Link
               to="/"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
               onClick={() => setIsMenuOpen(false)}
             >
+              <Home className="h-4 w-4 mr-2" />
               Home
+            </Link>
+
+            <Link
+              to="/about"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Info className="h-4 w-4 mr-2" />
+              About
+            </Link>
+
+            <Link
+              to="/blog"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Blog
             </Link>
 
             {/* Show these links only if not logged in */}
@@ -119,30 +171,34 @@ const Header = () => {
               <>
                 <a
                   href="#features"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Sparkles className="h-4 w-4 mr-2" />
                   Features
                 </a>
                 <a
                   href="#testimonials"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Star className="h-4 w-4 mr-2" />
                   Testimonials
                 </a>
                 <Link
                   to="/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <LogIn className="h-4 w-4 mr-2" />
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <UserPlus className="h-4 w-4 mr-2" />
                   Register
                 </Link>
               </>

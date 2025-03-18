@@ -24,6 +24,10 @@ import PrivacyPolicy from "./components/Legal/PrivacyPolicy";
 import TermsOfService from "./components/Legal/TermsOfService";
 import CookiePolicy from "./components/Legal/CookiePolicy";
 
+// New Pages:
+import About from "./components/About/About";
+import Blog from "./components/Blog/Blog";
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
@@ -97,6 +101,27 @@ function App() {
             <>
               <PageTitle title="Account Deleted | DailyInspire" />
               <AccountDeleted />
+            </>
+          }
+        />
+
+        {/* About and Blog Routes */}
+        <Route
+          path="/about"
+          element={
+            <>
+              <PageTitle title="About Us | DailyInspire" />
+              <About />
+            </>
+          }
+        />
+
+        <Route
+          path="/blog"
+          element={
+            <>
+              <PageTitle title="Blog | DailyInspire" />
+              <Blog />
             </>
           }
         />
