@@ -9,6 +9,7 @@ import {
   X,
   Edit,
   AlertTriangle,
+  Loader
 } from "lucide-react";
 import Header from "../General/Header";
 import Footer from "../General/Footer";
@@ -131,7 +132,11 @@ const UserPreferences = () => {
   };
 
   if (loading && !formData.email) {
-    return <div className="loading">Loading your preferences...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader className="animate-spin h-10 w-10 text-indigo-500" />
+      </div>
+    );
   }
 
   return (
