@@ -46,7 +46,7 @@ const UserPreferences = () => {
   });
 
   // Add state for checkout URL
-  const [checkoutUrl, setCheckoutUrl] = useState("");
+  const [checkoutId, setCheckoutId] = useState("");
 
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -103,7 +103,7 @@ const UserPreferences = () => {
               },
             }
           );
-          setCheckoutUrl(checkoutResponse.data.checkoutUrl);
+          setCheckoutId(checkoutResponse.data.checkoutId);
         }
       } catch (error) {
         console.error("Error fetching subscription data:", error);
@@ -113,6 +113,17 @@ const UserPreferences = () => {
 
     fetchPreferences();
     fetchSubscriptionData(); // Call the new function
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://app.lemonsqueezy.com/js/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -322,14 +333,26 @@ const UserPreferences = () => {
                       <p className="text-sm text-gray-600 mb-4">
                         You don't have an active subscription
                       </p>
-                      <a
-                        href={checkoutUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => {
+                          if (window.createLemonSqueezy && checkoutId) {
+                            window
+                              .createLemonSqueezy()
+                              .Setup({
+                                checkoutId: checkoutId,
+                                customData: { user_id: formData._id },
+                              })
+                              .open();
+                          } else {
+                            console.error(
+                              "Lemon Squeezy checkout not available or checkout ID missing"
+                            );
+                          }
+                        }}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                       >
                         Subscribe Now
-                      </a>
+                      </button>
                     </div>
                   )}
                 </div>
