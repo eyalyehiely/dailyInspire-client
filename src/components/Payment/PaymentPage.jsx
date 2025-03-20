@@ -64,6 +64,13 @@ const PaymentPage = () => {
         setVariantId(response.data.variantId || "730358");
         setDirectCheckoutUrl(response.data.directCheckoutUrl || "");
 
+        // Store user ID explicitly and in localStorage as a backup
+        if (response.data.userId) {
+          console.log("Setting user ID for checkout:", response.data.userId);
+          setUserId(response.data.userId);
+          localStorage.setItem("userId", response.data.userId);
+        }
+
         // Check subscription status
         if (response.data.isPaid) {
           // If user already has an active paid subscription, go to success page
@@ -78,7 +85,6 @@ const PaymentPage = () => {
 
         setCheckoutUrl(response.data.checkoutUrl);
         setCheckoutId(response.data.checkoutId);
-        setUserId(response.data.userId);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching checkout info:", err);
@@ -99,25 +105,49 @@ const PaymentPage = () => {
 
   const handleProceedToPayment = () => {
     try {
-      // Get the current user ID
-      const currentUserId =
-        userId || userData?.id || localStorage.getItem("userId") || "unknown";
-      console.log("Current user ID for checkout:", currentUserId);
+      // Get the current user ID with clear logging for each check
+      let currentUserId = null;
 
-      // LemonSqueezy checkout URL format changed - now must use the checkout.lemonsqueezy.com domain
-      // Direct variant-based URL: https://checkout.lemonsqueezy.com/buy/[variant]
-      const checkoutUrl = `https://checkout.lemonsqueezy.com/buy/${variantId}`;
+      // Try to get from state first
+      if (userId) {
+        console.log("Using user ID from state:", userId);
+        currentUserId = userId;
+      }
+      // Then from userData (if coming from registration)
+      else if (userData?.id) {
+        console.log("Using user ID from registration flow:", userData.id);
+        currentUserId = userData.id;
+      }
+      // Then from localStorage as fallback
+      else if (localStorage.getItem("userId")) {
+        console.log(
+          "Using user ID from localStorage:",
+          localStorage.getItem("userId")
+        );
+        currentUserId = localStorage.getItem("userId");
+      }
+      // Last resort fallback
+      else {
+        console.warn("No user ID found, using fallback value");
+        currentUserId = "unknown";
+      }
 
-      // Append parameters
-      const params = new URLSearchParams();
-      params.append("checkout[custom][user_id]", currentUserId);
+      console.log("Final user ID for checkout:", currentUserId);
 
-      // Create the final URL
-      const finalUrl = `${checkoutUrl}?${params.toString()}`;
+      // Store in local storage for potential webhook fallback
+      localStorage.setItem("userId", currentUserId);
+
+      // Create a properly encoded URL for LemonSqueezy
+      const baseUrl = `https://checkout.lemonsqueezy.com/buy/${variantId}`;
+
+      // Create the final URL with proper parameter encoding
+      const finalUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(
+        currentUserId
+      )}`;
       console.log("Final checkout URL:", finalUrl);
 
-      // Navigate to the checkout
-      window.open(finalUrl, "_blank");
+      // Navigate directly to the checkout page
+      window.location.href = finalUrl;
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");
@@ -292,6 +322,20 @@ const PaymentPage = () => {
             ? "Subscribe Now"
             : "Update Subscription"}
         </button>
+
+        {/* Test link for debugging */}
+        <div className="mt-4 text-xs text-center">
+          <a
+            href={`https://checkout.lemonsqueezy.com/buy/${variantId}?checkout[custom][user_id]=${encodeURIComponent(
+              userId || "test"
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            Test Direct Checkout Link
+          </a>
+        </div>
 
         <p className="text-center text-sm text-gray-500 mt-4">
           By proceeding, you agree to our Terms of Service and Privacy Policy.
