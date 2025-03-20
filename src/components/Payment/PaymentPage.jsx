@@ -128,8 +128,11 @@ const PaymentPage = () => {
       }
       // Last resort fallback
       else {
-        console.warn("No user ID found, using fallback value");
-        currentUserId = "unknown";
+        console.warn("No user ID found, cannot proceed with payment");
+        setError(
+          "Unable to identify your account. Please try logging in again."
+        );
+        return;
       }
 
       console.log("Final user ID for checkout:", currentUserId);
@@ -142,7 +145,17 @@ const PaymentPage = () => {
       // Store in local storage for potential webhook fallback
       localStorage.setItem("userId", currentUserId);
 
-      // Build the URL with the correct format
+      // Use directCheckoutUrl if available from server
+      if (directCheckoutUrl) {
+        console.log(
+          "Using server-provided direct checkout URL:",
+          directCheckoutUrl
+        );
+        window.location.href = directCheckoutUrl;
+        return;
+      }
+
+      // Build the URL with the correct format as fallback
       // Base URL must include the variant ID in the path
       const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${currentVariantId}`;
 
@@ -152,6 +165,27 @@ const PaymentPage = () => {
       )}&discount=0`;
 
       console.log("Final checkout URL:", finalUrl);
+
+      // Log to server for debugging
+      try {
+        const token = localStorage.getItem("authToken");
+        axios
+          .post(
+            "/api/payments/log-checkout",
+            {
+              checkoutUrl: finalUrl,
+              userId: currentUserId,
+            },
+            {
+              headers: {
+                "x-auth-token": token,
+              },
+            }
+          )
+          .catch((err) => console.error("Error logging checkout:", err));
+      } catch (e) {
+        console.error("Error logging checkout URL:", e);
+      }
 
       // Navigate directly to the checkout page
       window.location.href = finalUrl;
