@@ -50,13 +50,10 @@ const UserPreferences = () => {
       try {
         setLoading(true);
 
-        const authTokensString = localStorage.getItem("authTokens");
-        if (!authTokensString) {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
           throw new Error("Authentication token not found");
         }
-
-        const authTokens = JSON.parse(authTokensString);
-        const token = authTokens.token;
 
         const response = await axios.get(`${VITE_BASE_API}/auth/preferences`, {
           headers: {
@@ -77,13 +74,10 @@ const UserPreferences = () => {
     // Add a function to fetch subscription data
     const fetchSubscriptionData = async () => {
       try {
-        const authTokensString = localStorage.getItem("authTokens");
-        if (!authTokensString) {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
           throw new Error("Authentication token not found");
         }
-
-        const authTokens = JSON.parse(authTokensString);
-        const token = authTokens.token;
 
         const response = await axios.get(`${VITE_BASE_API}/payments/status`, {
           headers: {
@@ -121,13 +115,10 @@ const UserPreferences = () => {
       setError("");
       setSuccessMessage("");
 
-      const authTokensString = localStorage.getItem("authTokens");
-      if (!authTokensString) {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
         throw new Error("Authentication token not found");
       }
-
-      const authTokens = JSON.parse(authTokensString);
-      const token = authTokens.token;
 
       const response = await axios.put(
         `${VITE_BASE_API}/auth/preferences`,
@@ -162,7 +153,7 @@ const UserPreferences = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authTokens");
+    localStorage.removeItem("authToken");
     navigate("/deleted");
   };
 
@@ -510,11 +501,7 @@ const UserPreferences = () => {
 
               <div className="bg-red-50 border border-red-200 rounded-lg p-6">
                 <DeleteAccount
-                  token={
-                    localStorage.getItem("authTokens")
-                      ? JSON.parse(localStorage.getItem("authTokens")).token
-                      : ""
-                  }
+                  token={localStorage.getItem("authToken")}
                   onLogout={handleLogout}
                 />
               </div>

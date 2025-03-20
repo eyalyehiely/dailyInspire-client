@@ -7,8 +7,8 @@ const LogoutButton = ({ variant = "default", className = "", size = "md" }) => {
 
   const handleLogout = () => {
     // Remove all authentication-related items from localStorage
-    localStorage.removeItem("authTokens");
-    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
 
     // Navigate to login page
     navigate("/login");

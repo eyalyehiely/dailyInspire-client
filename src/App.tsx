@@ -186,7 +186,7 @@ function App() {
             element={
               <>
                 <PageTitle title="Preferences | DailyInspire" />
-                <UserPreferences token={localStorage.getItem('authToken') || ''} />
+                <UserPreferences />
               </>
             }
           />

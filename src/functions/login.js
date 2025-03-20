@@ -14,7 +14,13 @@ export const login = async (formData) => {
                 }
             }
         );
-        localStorage.setItem('authTokens', JSON.stringify(response.data));
+        
+        // Store the token directly with key 'authToken' to match ProtectedRoute.jsx
+        localStorage.setItem('authToken', response.data.token);
+        
+        // Also store user data if needed
+        localStorage.setItem('userData', JSON.stringify(response.data.user));
+        
         return response.data;
     } catch (error) {
         console.error('Login failed:', error);

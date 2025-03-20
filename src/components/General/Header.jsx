@@ -18,7 +18,7 @@ import LogoutButton from "./LogoutButton";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isHomeDropdownOpen, setIsHomeDropdownOpen] = useState(false);
   const location = useLocation();
@@ -26,15 +26,16 @@ const Header = () => {
   const isHomePage = location.pathname === "/";
 
   useEffect(() => {
-    // Check if user is logged in
-    const authTokens = localStorage.getItem("authTokens");
-    const userData = localStorage.getItem("user");
+    // Check if user is authenticated
+    const authToken = localStorage.getItem("authToken");
+    const userData = localStorage.getItem("userData");
 
-    if (authTokens && userData) {
-      setIsLoggedIn(true);
+    // Update isAuthenticated state
+    if (authToken && userData) {
+      setIsAuthenticated(true);
       setUser(JSON.parse(userData));
     } else {
-      setIsLoggedIn(false);
+      setIsAuthenticated(false);
       setUser(null);
     }
   }, []);
@@ -145,7 +146,7 @@ const Header = () => {
   );
 
   // Auth links
-  const authLinks = !isLoggedIn ? (
+  const authLinks = !isAuthenticated ? (
     <>
       <Link
         to="/login"
@@ -275,7 +276,7 @@ const Header = () => {
             {mobileHomePageLinks}
 
             {/* Auth links */}
-            {!isLoggedIn ? (
+            {!isAuthenticated ? (
               <>
                 <Link
                   to="/login"

@@ -15,9 +15,9 @@ const DeleteAccount = ({ token, onLogout }) => {
 
   useEffect(() => {
     // Get user data from localStorage
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      setUser(JSON.parse(userDataString));
     }
   }, []);
 
