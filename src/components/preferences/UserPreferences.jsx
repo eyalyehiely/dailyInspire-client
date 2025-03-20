@@ -261,6 +261,9 @@ const UserPreferences = () => {
     console.log("===== SUBSCRIPTION DEBUG =====");
     console.log("Subscribe button clicked");
     console.log("subscriptionData:", subscriptionData);
+    console.log("formData:", formData);
+    console.log("userId from server:", subscriptionData.userId);
+    console.log("_id from form:", formData._id);
     console.log("===== END DEBUG =====");
 
     // Use direct URL method only - more reliable
