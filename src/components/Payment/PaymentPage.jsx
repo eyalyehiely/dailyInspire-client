@@ -17,6 +17,7 @@ const PaymentPage = () => {
   const [userId, setUserId] = useState("");
   const [productId, setProductId] = useState("");
   const [variantId, setVariantId] = useState("");
+  const [directCheckoutUrl, setDirectCheckoutUrl] = useState("");
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
@@ -56,6 +57,13 @@ const PaymentPage = () => {
           },
         });
 
+        console.log("Checkout info response:", response.data);
+
+        // Store product and variant IDs
+        setProductId(response.data.productId || "471688");
+        setVariantId(response.data.variantId || "730358");
+        setDirectCheckoutUrl(response.data.directCheckoutUrl || "");
+
         // Check subscription status
         if (response.data.isPaid) {
           // If user already has an active paid subscription, go to success page
@@ -68,12 +76,9 @@ const PaymentPage = () => {
           setSubscriptionStatus(response.data.subscriptionStatus);
         }
 
-        // Set all checkout data
         setCheckoutUrl(response.data.checkoutUrl);
         setCheckoutId(response.data.checkoutId);
         setUserId(response.data.userId);
-        setProductId(response.data.productId);
-        setVariantId(response.data.variantId);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching checkout info:", err);
@@ -93,41 +98,35 @@ const PaymentPage = () => {
   }, [userData, navigate, location.state]);
 
   const handleProceedToPayment = () => {
-    // Try to use the overlay checkout first
-    if (checkoutJsLoaded && window.createLemonSqueezy && checkoutId) {
-      try {
-        console.log("Opening Lemon Squeezy checkout overlay");
-        window
-          .createLemonSqueezy()
-          .Setup({
-            checkoutId: checkoutId,
-            customData: { user_id: userId || userData?.id },
-          })
-          .open();
-        return;
-      } catch (error) {
-        console.error("Error opening Lemon Squeezy checkout overlay:", error);
-        // Fall through to direct URL method
-      }
-    }
-
-    // Fallback to direct URL method if overlay fails or is not available
+    // Use direct URL method for consistency
     try {
-      console.log("Using direct URL checkout method");
-
-      // Make sure we have the proper IDs
-      if (!productId || !variantId) {
-        throw new Error("Missing product or variant ID");
+      // Use the directCheckoutUrl from the server if available
+      if (directCheckoutUrl) {
+        console.log(
+          "Using direct checkout URL from server:",
+          directCheckoutUrl
+        );
+        window.location.href = directCheckoutUrl;
+        return;
       }
 
-      // Build the checkout URL with the user ID included as custom data
+      // Fallback to constructing the URL ourselves
+      console.log("Constructing direct URL for checkout");
       const storeName = "dailyinspire"; // Your Lemon Squeezy store name
-      const directUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
-        userId || userData?.id || "unknown"
-      }`;
 
-      // Navigate to the checkout URL
-      window.location.href = directUrl;
+      // Use state variables that were set during fetchCheckoutInfo
+      const userId =
+        userData?.id || localStorage.getItem("userId") || "unknown";
+
+      console.log("Using IDs for checkout:", { productId, variantId, userId });
+
+      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
+      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${userId}`;
+
+      console.log("Navigating to URL:", fallbackUrl);
+
+      // Navigate directly - use location.href for full page navigation
+      window.location.href = fallbackUrl;
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");

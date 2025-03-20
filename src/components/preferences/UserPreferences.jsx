@@ -46,6 +46,7 @@ const UserPreferences = () => {
     productId: "",
     variantId: "",
     userId: "",
+    directCheckoutUrl: "",
   });
 
   // Add state for checkout URL
@@ -107,6 +108,7 @@ const UserPreferences = () => {
           productId: response.data.productId,
           variantId: response.data.variantId,
           userId: response.data.userId,
+          directCheckoutUrl: response.data.directCheckoutUrl || "",
         });
         setLoading(false);
       } catch (error) {
@@ -258,61 +260,45 @@ const UserPreferences = () => {
     // Add detailed logging to see what values we have
     console.log("===== SUBSCRIPTION DEBUG =====");
     console.log("Subscribe button clicked");
-    console.log("checkoutId:", checkoutId);
     console.log("subscriptionData:", subscriptionData);
-    console.log("userId:", subscriptionData.userId);
-    console.log("productId:", subscriptionData.productId);
-    console.log("variantId:", subscriptionData.variantId);
-    console.log("formData:", formData);
-    console.log("Window LemonSqueezy available:", !!window.createLemonSqueezy);
     console.log("===== END DEBUG =====");
 
-    if (window.createLemonSqueezy && checkoutId) {
-      try {
-        console.log("Opening Lemon Squeezy checkout overlay");
-        window
-          .createLemonSqueezy()
-          .Setup({
-            checkoutId: checkoutId,
-            customData: { user_id: subscriptionData.userId || formData._id },
-          })
-          .open();
+    // Use direct URL method only - more reliable
+    try {
+      // Use the directCheckoutUrl from the server if available
+      if (subscriptionData.directCheckoutUrl) {
+        console.log(
+          "Using direct checkout URL from server:",
+          subscriptionData.directCheckoutUrl
+        );
+        window.location.href = subscriptionData.directCheckoutUrl;
         return false;
-      } catch (error) {
-        console.error("Error opening Lemon Squeezy checkout overlay:", error);
-        // Fall through to direct URL method
       }
-    } else {
-      console.error(
-        "Lemon Squeezy checkout not available or checkout ID missing",
-        { checkoutId, checkoutJsLoaded }
-      );
 
-      // Fallback: If the overlay doesn't work, use the direct URL
+      // Fallback to constructing the URL ourselves
+      console.log("Constructing direct URL for checkout");
       const storeName = "dailyinspire"; // Your Lemon Squeezy store name
-      // Use product and variant IDs from server response
-      const productId = subscriptionData.productId;
-      const variantId = subscriptionData.variantId;
 
-      if (!productId || !variantId) {
-        console.error("Missing product or variant ID");
-        setError("Unable to process payment. Please try again later.");
-        return false;
-      }
-
-      // Create a fallback URL with the user ID
-      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
+      // Use hardcoded values if server doesn't return them
+      const productId = subscriptionData.productId || "471688";
+      const variantId = subscriptionData.variantId || "730358";
       const userId = subscriptionData.userId || formData._id || "unknown";
+
+      console.log("Using IDs for checkout:", { productId, variantId, userId });
+
+      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
       const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${userId}`;
 
-      console.log("Navigating to fallback URL:", fallbackUrl);
+      console.log("Navigating to URL:", fallbackUrl);
 
-      // Navigate directly
+      // Navigate directly - use location.href for full page navigation
       window.location.href = fallbackUrl;
+      return false;
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      setError("Unable to process payment. Please try again later.");
+      return false;
     }
-
-    // Return false to prevent any other behavior
-    return false;
   };
 
   if (loading && !formData.email) {
