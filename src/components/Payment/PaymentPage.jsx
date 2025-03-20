@@ -106,22 +106,20 @@ const PaymentPage = () => {
           "Using direct checkout URL from server:",
           directCheckoutUrl
         );
-        window.location.href = directCheckoutUrl;
+
+        // Add checkout parameters to disable tax calculation
+        const finalUrl = `${directCheckoutUrl}&checkout[tax_status]=disabled`;
+        console.log("Final checkout URL with tax disabled:", finalUrl);
+
+        window.location.href = finalUrl;
         return;
       }
 
       // Fallback to constructing the URL ourselves
       console.log("Constructing direct URL for checkout");
-      const storeName = "dailyinspire"; // Your Lemon Squeezy store name
 
-      // Use state variables that were set during fetchCheckoutInfo
-      const userId =
-        userData?.id || localStorage.getItem("userId") || "unknown";
-
-      console.log("Using IDs for checkout:", { productId, variantId, userId });
-
-      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
-      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/?variant=${variantId}&checkout[custom][user_id]=${userId}`;
+      // Format 2: https://checkout.lemonsqueezy.com/buy/[variant]?media=0
+      const fallbackUrl = `https://checkout.lemonsqueezy.com/buy/${variantId}?checkout[custom][user_id]=${userId}&checkout[tax_status]=disabled`;
 
       console.log("Navigating to URL:", fallbackUrl);
 
