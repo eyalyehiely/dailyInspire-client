@@ -301,9 +301,9 @@ const UserPreferences = () => {
       }
 
       // Create a fallback URL with the user ID
-      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
-        subscriptionData.userId || formData._id || "unknown"
-      }`;
+      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
+      const userId = subscriptionData.userId || formData._id || "unknown";
+      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${userId}`;
 
       console.log("Navigating to fallback URL:", fallbackUrl);
 
