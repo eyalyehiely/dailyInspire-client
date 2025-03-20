@@ -435,7 +435,7 @@ const PaymentPage = () => {
               inbox.
             </p>
             <div className="flex justify-between items-center">
-              <span className="text-lg font-bold">$4.99/month</span>
+              <span className="text-lg font-bold">$1.99/month</span>
               <span className="text-sm text-gray-500">Billed monthly</span>
             </div>
           </div>
