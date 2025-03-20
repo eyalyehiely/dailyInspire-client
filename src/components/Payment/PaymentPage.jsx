@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CreditCard, Check, AlertCircle } from "lucide-react";
+import { CreditCard, Check, AlertCircle, UserPlus } from "lucide-react";
 import Header from "../General/Header";
 import axios from "axios";
 
@@ -11,13 +11,18 @@ const PaymentPage = () => {
   const [error, setError] = useState("");
   const [checkoutUrl, setCheckoutUrl] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("none");
+  const [isNewUser, setIsNewUser] = useState(false);
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
 
   useEffect(() => {
-    // If no user data was passed, redirect to register
-    if (!userData) {
+    // Set isNewUser based on whether we came directly from registration
+    setIsNewUser(!!userData && location.state?.from === "register");
+
+    // If no auth token, redirect to register
+    const token = localStorage.getItem("authToken");
+    if (!token) {
       navigate("/register");
       return;
     }
@@ -26,12 +31,6 @@ const PaymentPage = () => {
     const fetchCheckoutInfo = async () => {
       try {
         setLoading(true);
-        // We'll use the token from local storage (set during registration)
-        const token = localStorage.getItem("authToken");
-
-        if (!token) {
-          throw new Error("Authentication required");
-        }
 
         const response = await axios.get("/api/payments/checkout-info", {
           headers: {
@@ -61,14 +60,14 @@ const PaymentPage = () => {
     };
 
     fetchCheckoutInfo();
-  }, [userData, navigate]);
+  }, [userData, navigate, location.state]);
 
   const handleProceedToPayment = () => {
     // Redirect to the Lemon Squeezy checkout URL with user_id included
     // This is essential for the webhook to associate the subscription with the user
     if (checkoutUrl) {
       window.location.href = `${checkoutUrl}?checkout[custom][user_id]=${
-        userData.id || localStorage.getItem("userId")
+        userData?.id || localStorage.getItem("userId")
       }`;
     } else {
       // Fallback if checkout URL is not available
@@ -177,8 +176,24 @@ const PaymentPage = () => {
       <Header />
       <div className="max-w-lg mx-auto mt-8 p-8 bg-white rounded-lg shadow-xl border-t-4 border-indigo-500">
         <h2 className="text-2xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-          Complete Your Subscription
+          {isNewUser ? "Complete Your Registration" : "Subscribe to Premium"}
         </h2>
+
+        {isNewUser && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
+            <UserPlus className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-medium text-blue-800 mb-2">
+                One More Step to Activate Your Account
+              </h3>
+              <p className="text-blue-700">
+                To complete your registration and activate your account, please
+                subscribe to our premium service below. Your account will not be
+                fully activated until subscription is complete.
+              </p>
+            </div>
+          </div>
+        )}
 
         {renderSubscriptionStatus()}
 
@@ -222,7 +237,9 @@ const PaymentPage = () => {
           className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-md shadow-md hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center"
         >
           <CreditCard className="mr-2 h-5 w-5" />
-          {subscriptionStatus === "none"
+          {isNewUser
+            ? "Complete Registration"
+            : subscriptionStatus === "none"
             ? "Subscribe Now"
             : "Update Subscription"}
         </button>

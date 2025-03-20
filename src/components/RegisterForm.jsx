@@ -95,7 +95,12 @@ const RegisterForm = ({ onLoginClick }) => {
     setIsSubmitting(true);
     try {
       const userData = await signup(formData, null, setIsSubmitting);
-      navigate("/payment", { state: { userData } });
+      navigate("/payment", { 
+        state: { 
+          userData,
+          from: 'register'
+        } 
+      });
     } catch (error) {
       console.error("Signup error:", error);
       setApiError(
@@ -377,59 +382,4 @@ const RegisterForm = ({ onLoginClick }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:translate-y-[-2px] transition-all duration-200 ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              >
-                {isSubmitting ? "Signing Up..." : "Sign Up"}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Already have an account?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link to="/login">
-                <button
-                  onClick={onLoginClick}
-                  className="w-full flex justify-center items-center py-3 px-4 border border-indigo-300 rounded-lg shadow-sm text-base font-medium text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-                >
-                  <ArrowLeft className="mr-2 h-5 w-5" />
-                  Back to Login
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-      `}</style>
-    </>
-  );
-};
-
-export default RegisterForm;
+                className={`

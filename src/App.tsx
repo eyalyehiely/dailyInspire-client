@@ -179,7 +179,7 @@ function App() {
         />
 
         {/* Protected routes */}
-        <Route element={<ProtectedRoute requiredRole="Talent" />}>
+        <Route element={<ProtectedRoute />}>
 
           <Route
             path="/preferences"
