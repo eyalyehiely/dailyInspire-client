@@ -45,6 +45,7 @@ const UserPreferences = () => {
     subscriptionStatus: "none",
     productId: "",
     variantId: "",
+    userId: "",
   });
 
   // Add state for checkout URL
@@ -102,6 +103,7 @@ const UserPreferences = () => {
           subscriptionStatus: response.data.subscriptionStatus || "none",
           productId: response.data.productId,
           variantId: response.data.variantId,
+          userId: response.data.userId,
         });
         setLoading(false);
       } catch (error) {
@@ -261,7 +263,7 @@ const UserPreferences = () => {
           .createLemonSqueezy()
           .Setup({
             checkoutId: checkoutId,
-            customData: { user_id: formData._id },
+            customData: { user_id: subscriptionData.userId || formData._id },
           })
           .open();
       } catch (error) {
@@ -288,7 +290,7 @@ const UserPreferences = () => {
 
       // Create a fallback URL with the user ID
       const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
-        formData._id || "unknown"
+        subscriptionData.userId || formData._id || "unknown"
       }`;
 
       // Navigate directly
@@ -388,7 +390,7 @@ const UserPreferences = () => {
                             Plan
                           </span>
                           <span className="text-sm font-medium text-gray-700">
-                            Premium ($4.99/month)
+                            Premium ($1.99/month)
                           </span>
                         </div>
                       )}
