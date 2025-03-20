@@ -48,6 +48,9 @@ const UserPreferences = () => {
   // Add state for checkout URL
   const [checkoutId, setCheckoutId] = useState("");
 
+  // Add state to track if checkout.js is loaded
+  const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
+
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
@@ -119,6 +122,13 @@ const UserPreferences = () => {
     const script = document.createElement("script");
     script.src = "https://app.lemonsqueezy.com/js/checkout.js";
     script.async = true;
+    script.onload = () => {
+      console.log("Lemon Squeezy checkout.js loaded");
+      setCheckoutJsLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Lemon Squeezy checkout.js");
+    };
     document.body.appendChild(script);
 
     return () => {
@@ -234,6 +244,53 @@ const UserPreferences = () => {
     }
   };
 
+  // Function to handle subscription checkout
+  const handleSubscribeClick = (e) => {
+    // Stop all event propagation and default behavior
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log("Subscribe button clicked");
+    console.log("Checkout ID:", checkoutId);
+    console.log("Lemon Squeezy available:", !!window.createLemonSqueezy);
+
+    if (window.createLemonSqueezy && checkoutId) {
+      try {
+        console.log("Opening Lemon Squeezy checkout");
+        window
+          .createLemonSqueezy()
+          .Setup({
+            checkoutId: checkoutId,
+            customData: { user_id: formData._id },
+          })
+          .open();
+      } catch (error) {
+        console.error("Error opening Lemon Squeezy checkout:", error);
+      }
+    } else {
+      console.error(
+        "Lemon Squeezy checkout not available or checkout ID missing",
+        { checkoutId, checkoutJsLoaded }
+      );
+
+      // Fallback: If the overlay doesn't work, use the direct URL
+      const storeName = "dailyinspire"; // Your Lemon Squeezy store name
+      const productId = "471688"; // Replace with your actual product ID
+      const variantId = "730358"; // Replace with your actual variant ID
+
+      // Create a fallback URL with the user ID
+      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
+        formData._id || "unknown"
+      }`;
+
+      // Navigate directly
+      window.location.href = fallbackUrl;
+    }
+
+    // Return false to prevent any other behavior
+    return false;
+  };
+
   if (loading && !formData.email) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -334,21 +391,9 @@ const UserPreferences = () => {
                         You don't have an active subscription
                       </p>
                       <button
-                        onClick={() => {
-                          if (window.createLemonSqueezy && checkoutId) {
-                            window
-                              .createLemonSqueezy()
-                              .Setup({
-                                checkoutId: checkoutId,
-                                customData: { user_id: formData._id },
-                              })
-                              .open();
-                          } else {
-                            console.error(
-                              "Lemon Squeezy checkout not available or checkout ID missing"
-                            );
-                          }
-                        }}
+                        onClick={handleSubscribeClick}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        type="button"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                       >
                         Subscribe Now
