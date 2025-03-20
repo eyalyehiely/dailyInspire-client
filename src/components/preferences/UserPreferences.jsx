@@ -45,6 +45,9 @@ const UserPreferences = () => {
     subscriptionStatus: "none",
   });
 
+  // Add state for checkout URL
+  const [checkoutUrl, setCheckoutUrl] = useState("");
+
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
@@ -89,6 +92,19 @@ const UserPreferences = () => {
           isPaid: response.data.isPaid,
           subscriptionStatus: response.data.subscriptionStatus || "none",
         });
+
+        // If not paid, fetch checkout URL
+        if (!response.data.isPaid) {
+          const checkoutResponse = await axios.get(
+            `${VITE_BASE_API}/payments/checkout-info`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setCheckoutUrl(checkoutResponse.data.checkoutUrl);
+        }
       } catch (error) {
         console.error("Error fetching subscription data:", error);
         // Don't set an error, as this is supplementary information
@@ -307,7 +323,9 @@ const UserPreferences = () => {
                         You don't have an active subscription
                       </p>
                       <a
-                        href="/payment"
+                        href={checkoutUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                       >
                         Subscribe Now
