@@ -36,7 +36,17 @@ const ProtectedRoute = () => {
         if (response.data.isValid) {
           console.log("Token is valid!");
           setIsAuthenticated(true);
-          setRegistrationComplete(true);
+
+          // Check if payment is required
+          if (
+            response.data.isPay === false ||
+            response.data.registrationComplete === false
+          ) {
+            console.log("User needs to complete payment");
+            setRegistrationComplete(false);
+          } else {
+            setRegistrationComplete(true);
+          }
         } else {
           // Token is invalid
           console.log("Token is invalid!");

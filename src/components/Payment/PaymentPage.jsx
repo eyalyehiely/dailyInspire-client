@@ -171,10 +171,17 @@ const PaymentPage = () => {
       // Base URL must include the variant ID in the path
       const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${currentVariantId}`;
 
+      // Get the application URL from environment or window.location
+      const appUrl =
+        import.meta.env.VITE_APP_URL ||
+        `${window.location.protocol}//${window.location.host}`;
+
       // Properly formatted query string with ? separator
       const finalUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(
         currentUserId
-      )}&discount=0`;
+      )}&discount=0&checkout[success_url]=${encodeURIComponent(
+        `${appUrl}/payment-success`
+      )}&checkout[cancel_url]=${encodeURIComponent(`${appUrl}/payment`)}`;
 
       console.log("Final checkout URL:", finalUrl);
 

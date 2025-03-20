@@ -289,8 +289,15 @@ const UserPreferences = () => {
 
       console.log("Using IDs for checkout:", { productId, variantId, userId });
 
+      // Get the application URL from environment or window.location
+      const appUrl =
+        import.meta.env.VITE_APP_URL ||
+        `${window.location.protocol}//${window.location.host}`;
+
       // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
-      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/?variant=${variantId}&checkout[custom][user_id]=${userId}`;
+      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/?variant=${variantId}&checkout[custom][user_id]=${userId}&checkout[success_url]=${encodeURIComponent(
+        `${appUrl}/payment-success`
+      )}&checkout[cancel_url]=${encodeURIComponent(`${appUrl}/preferences`)}`;
 
       console.log("Navigating to URL:", fallbackUrl);
 

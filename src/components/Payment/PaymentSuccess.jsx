@@ -20,6 +20,39 @@ const PaymentSuccess = () => {
           return;
         }
 
+        // First check if returning from LemonSqueezy payment
+        const urlParams = new URLSearchParams(window.location.search);
+        const checkoutId =
+          urlParams.get("checkout_id") || localStorage.getItem("checkoutId");
+
+        if (checkoutId) {
+          console.log("Detected return from payment. Checkout ID:", checkoutId);
+
+          // Store the checkout ID for future reference
+          localStorage.setItem("checkoutId", checkoutId);
+
+          // Attempt to check and update subscription status
+          try {
+            const subscriptionId = localStorage.getItem("subscriptionId");
+            if (subscriptionId) {
+              console.log(
+                "Found subscription ID in localStorage:",
+                subscriptionId
+              );
+              await axios.post(
+                "/api/payments/check-subscription",
+                { subscriptionId },
+                { headers: { "x-auth-token": token } }
+              );
+              console.log("Successfully checked subscription status");
+            }
+          } catch (err) {
+            console.error("Error checking subscription:", err);
+            // Continue with regular status check even if this fails
+          }
+        }
+
+        // Get the current payment status
         const response = await axios.get("/api/payments/status", {
           headers: {
             "x-auth-token": token,
@@ -28,6 +61,12 @@ const PaymentSuccess = () => {
 
         setSubscriptionStatus(response.data.subscriptionStatus || "active");
         setLoading(false);
+
+        // If a subscription ID is provided, store it
+        if (response.data.subscriptionId) {
+          localStorage.setItem("subscriptionId", response.data.subscriptionId);
+          console.log("Stored subscription ID:", response.data.subscriptionId);
+        }
       } catch (err) {
         console.error("Error fetching subscription status:", err);
         setError("Unable to load subscription information.");
