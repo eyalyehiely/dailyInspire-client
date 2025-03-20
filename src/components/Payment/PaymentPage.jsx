@@ -134,18 +134,23 @@ const PaymentPage = () => {
 
       console.log("Final user ID for checkout:", currentUserId);
 
+      // For 100% sure we have a variant ID
+      const currentVariantId =
+        variantId || "9e44dcc7-edab-43f0-b9a2-9d663d4af336";
+      console.log("Using variant ID:", currentVariantId);
+
       // Store in local storage for potential webhook fallback
       localStorage.setItem("userId", currentUserId);
 
-      // UPDATED: Using the store-specific domain that matches your actual LemonSqueezy setup
-      // Format: https://dailyinspire.lemonsqueezy.com/buy/[variant-uuid]
-      const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${variantId}`;
+      // Build the URL with the correct format
+      // Base URL must include the variant ID in the path
+      const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${currentVariantId}`;
 
-      // Create the final URL with parameters matching your actual LemonSqueezy configuration
-      // Adding both your custom parameter and the discount parameter seen in your URL
+      // Properly formatted query string with ? separator
       const finalUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(
         currentUserId
       )}&discount=0`;
+
       console.log("Final checkout URL:", finalUrl);
 
       // Navigate directly to the checkout page
@@ -328,7 +333,7 @@ const PaymentPage = () => {
         {/* Test link for debugging */}
         <div className="mt-4 text-xs text-center">
           <a
-            href={`https://dailyinspire.lemonsqueezy.com/buy/${variantId}?checkout[custom][user_id]=${encodeURIComponent(
+            href={`https://dailyinspire.lemonsqueezy.com/buy/9e44dcc7-edab-43f0-b9a2-9d663d4af336?checkout[custom][user_id]=${encodeURIComponent(
               userId || "test"
             )}&discount=0`}
             target="_blank"
