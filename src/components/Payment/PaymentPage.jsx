@@ -10,6 +10,7 @@ const PaymentPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [checkoutUrl, setCheckoutUrl] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState("none");
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
@@ -38,10 +39,16 @@ const PaymentPage = () => {
           },
         });
 
-        // If user is already paid, go to success page
+        // Check subscription status
         if (response.data.isPaid) {
+          // If user already has an active paid subscription, go to success page
           navigate("/payment-success");
           return;
+        }
+
+        // If subscription is in another state, we might want to handle differently
+        if (response.data.subscriptionStatus) {
+          setSubscriptionStatus(response.data.subscriptionStatus);
         }
 
         setCheckoutUrl(response.data.checkoutUrl);
@@ -57,14 +64,71 @@ const PaymentPage = () => {
   }, [userData, navigate]);
 
   const handleProceedToPayment = () => {
-    // For demonstration purposes, we'll just navigate to success page directly
-    // In a real app, you would redirect to the payment processor
+    // Redirect to the Lemon Squeezy checkout URL with user_id included
+    // This is essential for the webhook to associate the subscription with the user
+    if (checkoutUrl) {
+      window.location.href = `${checkoutUrl}?checkout[custom][user_id]=${
+        userData.id || localStorage.getItem("userId")
+      }`;
+    } else {
+      // Fallback if checkout URL is not available
+      setError("Checkout URL is not available. Please try again later.");
+    }
+  };
 
-    // Option 1: Redirect to external payment page
-    // window.location.href = checkoutUrl + `?checkout[custom][user_id]=${userData.id}`;
-
-    // Option 2: For this demo, we'll just go to success page
-    navigate("/payment-success", { state: { userData } });
+  // Render subscription status message if applicable
+  const renderSubscriptionStatus = () => {
+    switch (subscriptionStatus) {
+      case "cancelled":
+        return (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="font-medium text-yellow-800 mb-2">
+              Subscription Cancelled
+            </h3>
+            <p className="text-yellow-700">
+              Your subscription has been cancelled but is still active until the
+              end of the billing period. You can resubscribe to continue
+              receiving premium benefits after that.
+            </p>
+          </div>
+        );
+      case "payment_failed":
+        return (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <h3 className="font-medium text-red-800 mb-2">Payment Failed</h3>
+            <p className="text-red-700">
+              Your last payment failed. Please update your payment information
+              to continue your subscription.
+            </p>
+          </div>
+        );
+      case "paused":
+        return (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="font-medium text-blue-800 mb-2">
+              Subscription Paused
+            </h3>
+            <p className="text-blue-700">
+              Your subscription is currently paused. You can resume your
+              subscription to continue receiving premium benefits.
+            </p>
+          </div>
+        );
+      case "expired":
+        return (
+          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <h3 className="font-medium text-gray-800 mb-2">
+              Subscription Expired
+            </h3>
+            <p className="text-gray-700">
+              Your subscription has expired. Subscribe again to continue
+              receiving premium benefits.
+            </p>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -116,6 +180,8 @@ const PaymentPage = () => {
           Complete Your Subscription
         </h2>
 
+        {renderSubscriptionStatus()}
+
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-medium text-gray-800 mb-2">
             DailyInspire Premium
@@ -156,7 +222,9 @@ const PaymentPage = () => {
           className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-md shadow-md hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center"
         >
           <CreditCard className="mr-2 h-5 w-5" />
-          Proceed to Payment
+          {subscriptionStatus === "none"
+            ? "Subscribe Now"
+            : "Update Subscription"}
         </button>
 
         <p className="text-center text-sm text-gray-500 mt-4">

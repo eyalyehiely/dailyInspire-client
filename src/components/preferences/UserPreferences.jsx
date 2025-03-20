@@ -9,7 +9,8 @@ import {
   X,
   Edit,
   AlertTriangle,
-  Loader
+  Loader,
+  CreditCard,
 } from "lucide-react";
 import Header from "../General/Header";
 import Footer from "../General/Footer";
@@ -37,6 +38,12 @@ const UserPreferences = () => {
   const timezones = Intl.supportedValuesOf("timeZone");
 
   const navigate = useNavigate();
+
+  // Add subscription status state
+  const [subscriptionData, setSubscriptionData] = useState({
+    isPaid: false,
+    subscriptionStatus: "none",
+  });
 
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -67,7 +74,35 @@ const UserPreferences = () => {
       }
     };
 
+    // Add a function to fetch subscription data
+    const fetchSubscriptionData = async () => {
+      try {
+        const authTokensString = localStorage.getItem("authTokens");
+        if (!authTokensString) {
+          throw new Error("Authentication token not found");
+        }
+
+        const authTokens = JSON.parse(authTokensString);
+        const token = authTokens.token;
+
+        const response = await axios.get(`${VITE_BASE_API}/payments/status`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setSubscriptionData({
+          isPaid: response.data.isPaid,
+          subscriptionStatus: response.data.subscriptionStatus || "none",
+        });
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+        // Don't set an error, as this is supplementary information
+      }
+    };
+
     fetchPreferences();
+    fetchSubscriptionData(); // Call the new function
   }, []);
 
   const handleChange = (e) => {
@@ -131,6 +166,56 @@ const UserPreferences = () => {
     navigate("/deleted");
   };
 
+  const getSubscriptionStatusDisplay = () => {
+    const status = subscriptionData.subscriptionStatus;
+
+    switch (status) {
+      case "active":
+        return {
+          label: "Active",
+          color: "text-green-600",
+          bg: "bg-green-50",
+          description: "Your premium subscription is active",
+        };
+      case "cancelled":
+        return {
+          label: "Cancelled",
+          color: "text-yellow-600",
+          bg: "bg-yellow-50",
+          description:
+            "Your subscription is cancelled but active until the end of the billing period",
+        };
+      case "expired":
+        return {
+          label: "Expired",
+          color: "text-gray-600",
+          bg: "bg-gray-50",
+          description: "Your subscription has expired",
+        };
+      case "paused":
+        return {
+          label: "Paused",
+          color: "text-blue-600",
+          bg: "bg-blue-50",
+          description: "Your subscription is paused",
+        };
+      case "payment_failed":
+        return {
+          label: "Payment Failed",
+          color: "text-red-600",
+          bg: "bg-red-50",
+          description: "Your last payment failed",
+        };
+      default:
+        return {
+          label: "Not Subscribed",
+          color: "text-gray-600",
+          bg: "bg-gray-50",
+          description: "You don't have an active subscription",
+        };
+    }
+  };
+
   if (loading && !formData.email) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -188,6 +273,59 @@ const UserPreferences = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-5 divide-y divide-gray-200">
+              {/* Subscription Information Section */}
+              <div className="py-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2 text-indigo-500" />
+                  Subscription Information
+                </h3>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  {subscriptionData.isPaid ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Status
+                        </span>
+                        <span
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${
+                            getSubscriptionStatusDisplay().bg
+                          } ${getSubscriptionStatusDisplay().color}`}
+                        >
+                          {getSubscriptionStatusDisplay().label}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-4">
+                        {getSubscriptionStatusDisplay().description}
+                      </p>
+
+                      {subscriptionData.subscriptionStatus === "active" && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">
+                            Plan
+                          </span>
+                          <span className="text-sm font-medium text-gray-700">
+                            Premium ($4.99/month)
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-2">
+                      <p className="text-sm text-gray-600 mb-4">
+                        You don't have an active subscription
+                      </p>
+                      <a
+                        href="/payment"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                      >
+                        Subscribe Now
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Personal Information Section */}
               <div className="py-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
