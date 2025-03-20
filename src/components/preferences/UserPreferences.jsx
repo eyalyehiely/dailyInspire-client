@@ -88,11 +88,14 @@ const UserPreferences = () => {
           throw new Error("Authentication token not found");
         }
 
+        console.log("Fetching subscription data...");
         const response = await axios.get(`${VITE_BASE_API}/payments/status`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        console.log("Subscription data response:", response.data);
 
         const checkoutId = response.data.checkoutId;
         setCheckoutId(checkoutId);
@@ -252,13 +255,21 @@ const UserPreferences = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Add detailed logging to see what values we have
+    console.log("===== SUBSCRIPTION DEBUG =====");
     console.log("Subscribe button clicked");
-    console.log("Checkout ID:", checkoutId);
-    console.log("Lemon Squeezy available:", !!window.createLemonSqueezy);
+    console.log("checkoutId:", checkoutId);
+    console.log("subscriptionData:", subscriptionData);
+    console.log("userId:", subscriptionData.userId);
+    console.log("productId:", subscriptionData.productId);
+    console.log("variantId:", subscriptionData.variantId);
+    console.log("formData:", formData);
+    console.log("Window LemonSqueezy available:", !!window.createLemonSqueezy);
+    console.log("===== END DEBUG =====");
 
     if (window.createLemonSqueezy && checkoutId) {
       try {
-        console.log("Opening Lemon Squeezy checkout");
+        console.log("Opening Lemon Squeezy checkout overlay");
         window
           .createLemonSqueezy()
           .Setup({
@@ -266,6 +277,7 @@ const UserPreferences = () => {
             customData: { user_id: subscriptionData.userId || formData._id },
           })
           .open();
+        return false;
       } catch (error) {
         console.error("Error opening Lemon Squeezy checkout overlay:", error);
         // Fall through to direct URL method
@@ -292,6 +304,8 @@ const UserPreferences = () => {
       const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
         subscriptionData.userId || formData._id || "unknown"
       }`;
+
+      console.log("Navigating to fallback URL:", fallbackUrl);
 
       // Navigate directly
       window.location.href = fallbackUrl;
