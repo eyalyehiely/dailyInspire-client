@@ -10,8 +10,13 @@ const PaymentPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [checkoutUrl, setCheckoutUrl] = useState("");
+  const [checkoutId, setCheckoutId] = useState("");
+  const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState("none");
   const [isNewUser, setIsNewUser] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [productId, setProductId] = useState("");
+  const [variantId, setVariantId] = useState("");
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
@@ -26,6 +31,19 @@ const PaymentPage = () => {
       navigate("/register");
       return;
     }
+
+    // Load the LemonSqueezy checkout.js script
+    const script = document.createElement("script");
+    script.src = "https://app.lemonsqueezy.com/js/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Lemon Squeezy checkout.js loaded");
+      setCheckoutJsLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Lemon Squeezy checkout.js");
+    };
+    document.body.appendChild(script);
 
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
@@ -50,7 +68,12 @@ const PaymentPage = () => {
           setSubscriptionStatus(response.data.subscriptionStatus);
         }
 
+        // Set all checkout data
         setCheckoutUrl(response.data.checkoutUrl);
+        setCheckoutId(response.data.checkoutId);
+        setUserId(response.data.userId);
+        setProductId(response.data.productId);
+        setVariantId(response.data.variantId);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching checkout info:", err);
@@ -60,18 +83,54 @@ const PaymentPage = () => {
     };
 
     fetchCheckoutInfo();
+
+    return () => {
+      // Clean up the script when component unmounts
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, [userData, navigate, location.state]);
 
   const handleProceedToPayment = () => {
-    // Redirect to the Lemon Squeezy checkout URL with user_id included
-    // This is essential for the webhook to associate the subscription with the user
-    if (checkoutUrl) {
-      window.location.href = `${checkoutUrl}?checkout[custom][user_id]=${
-        userData?.id || localStorage.getItem("userId")
+    // Try to use the overlay checkout first
+    if (checkoutJsLoaded && window.createLemonSqueezy && checkoutId) {
+      try {
+        console.log("Opening Lemon Squeezy checkout overlay");
+        window
+          .createLemonSqueezy()
+          .Setup({
+            checkoutId: checkoutId,
+            customData: { user_id: userId || userData?.id },
+          })
+          .open();
+        return;
+      } catch (error) {
+        console.error("Error opening Lemon Squeezy checkout overlay:", error);
+        // Fall through to direct URL method
+      }
+    }
+
+    // Fallback to direct URL method if overlay fails or is not available
+    try {
+      console.log("Using direct URL checkout method");
+
+      // Make sure we have the proper IDs
+      if (!productId || !variantId) {
+        throw new Error("Missing product or variant ID");
+      }
+
+      // Build the checkout URL with the user ID included as custom data
+      const storeName = "dailyinspire"; // Your Lemon Squeezy store name
+      const directUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
+        userId || userData?.id || "unknown"
       }`;
-    } else {
-      // Fallback if checkout URL is not available
-      setError("Checkout URL is not available. Please try again later.");
+
+      // Navigate to the checkout URL
+      window.location.href = directUrl;
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      setError("Unable to process payment. Please try again later.");
     }
   };
 

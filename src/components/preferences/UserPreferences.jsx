@@ -43,6 +43,8 @@ const UserPreferences = () => {
   const [subscriptionData, setSubscriptionData] = useState({
     isPaid: false,
     subscriptionStatus: "none",
+    productId: "",
+    variantId: "",
   });
 
   // Add state for checkout URL
@@ -91,26 +93,24 @@ const UserPreferences = () => {
           },
         });
 
+        const checkoutId = response.data.checkoutId;
+        setCheckoutId(checkoutId);
+
+        // Use the product and variant IDs from the server response instead of hardcoded values
         setSubscriptionData({
           isPaid: response.data.isPaid,
           subscriptionStatus: response.data.subscriptionStatus || "none",
+          productId: response.data.productId,
+          variantId: response.data.variantId,
         });
-
-        // If not paid, fetch checkout URL
-        if (!response.data.isPaid) {
-          const checkoutResponse = await axios.get(
-            `${VITE_BASE_API}/payments/checkout-info`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setCheckoutId(checkoutResponse.data.checkoutId);
-        }
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching subscription data:", error);
-        // Don't set an error, as this is supplementary information
+        console.error("Error fetching user data:", error);
+        setError(
+          error.response?.data?.message ||
+            "Failed to load user preferences. Please try again."
+        );
+        setLoading(false);
       }
     };
 
@@ -265,7 +265,8 @@ const UserPreferences = () => {
           })
           .open();
       } catch (error) {
-        console.error("Error opening Lemon Squeezy checkout:", error);
+        console.error("Error opening Lemon Squeezy checkout overlay:", error);
+        // Fall through to direct URL method
       }
     } else {
       console.error(
@@ -275,8 +276,15 @@ const UserPreferences = () => {
 
       // Fallback: If the overlay doesn't work, use the direct URL
       const storeName = "dailyinspire"; // Your Lemon Squeezy store name
-      const productId = "471688"; // Replace with your actual product ID
-      const variantId = "730358"; // Replace with your actual variant ID
+      // Use product and variant IDs from server response
+      const productId = subscriptionData.productId;
+      const variantId = subscriptionData.variantId;
+
+      if (!productId || !variantId) {
+        console.error("Missing product or variant ID");
+        setError("Unable to process payment. Please try again later.");
+        return false;
+      }
 
       // Create a fallback URL with the user ID
       const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/buy/${productId}?variant=${variantId}&checkout[custom][user_id]=${
