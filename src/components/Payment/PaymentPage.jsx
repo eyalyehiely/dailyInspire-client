@@ -98,33 +98,26 @@ const PaymentPage = () => {
   }, [userData, navigate, location.state]);
 
   const handleProceedToPayment = () => {
-    // Use direct URL method for consistency
     try {
-      // Use the directCheckoutUrl from the server if available
-      if (directCheckoutUrl) {
-        console.log(
-          "Using direct checkout URL from server:",
-          directCheckoutUrl
-        );
+      // Get the current user ID
+      const currentUserId =
+        userId || userData?.id || localStorage.getItem("userId") || "unknown";
+      console.log("Current user ID for checkout:", currentUserId);
 
-        // Add checkout parameters to disable tax calculation
-        const finalUrl = `${directCheckoutUrl}&checkout[tax_status]=disabled`;
-        console.log("Final checkout URL with tax disabled:", finalUrl);
+      // LemonSqueezy checkout URL format changed - now must use the checkout.lemonsqueezy.com domain
+      // Direct variant-based URL: https://checkout.lemonsqueezy.com/buy/[variant]
+      const checkoutUrl = `https://checkout.lemonsqueezy.com/buy/${variantId}`;
 
-        window.location.href = finalUrl;
-        return;
-      }
+      // Append parameters
+      const params = new URLSearchParams();
+      params.append("checkout[custom][user_id]", currentUserId);
 
-      // Fallback to constructing the URL ourselves
-      console.log("Constructing direct URL for checkout");
+      // Create the final URL
+      const finalUrl = `${checkoutUrl}?${params.toString()}`;
+      console.log("Final checkout URL:", finalUrl);
 
-      // Format 2: https://checkout.lemonsqueezy.com/buy/[variant]?media=0
-      const fallbackUrl = `https://checkout.lemonsqueezy.com/buy/${variantId}?checkout[custom][user_id]=${userId}&checkout[tax_status]=disabled`;
-
-      console.log("Navigating to URL:", fallbackUrl);
-
-      // Navigate directly - use location.href for full page navigation
-      window.location.href = fallbackUrl;
+      // Navigate to the checkout
+      window.open(finalUrl, "_blank");
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");
