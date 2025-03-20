@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Mail, Lock, ArrowRight, AlertCircle, LogIn } from "lucide-react";
 import { login } from "../../functions/login";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../General/Header";
 
 const LoginForm = ({ onRegisterClick, onLoginSuccess = () => {} }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -69,7 +70,7 @@ const LoginForm = ({ onRegisterClick, onLoginSuccess = () => {} }) => {
         if (typeof onLoginSuccess === "function") {
           onLoginSuccess();
         }
-        window.location.href = "/preferences";
+        navigate("/preferences");
       })
       .catch((error) => {
         console.error("Login error:", error);

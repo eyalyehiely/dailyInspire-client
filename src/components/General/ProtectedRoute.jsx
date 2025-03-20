@@ -12,6 +12,7 @@ const ProtectedRoute = () => {
     const verifyToken = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        console.log("Token from storage:", token ? "Found token" : "No token");
 
         if (!token) {
           setIsAuthenticated(false);
@@ -19,25 +20,37 @@ const ProtectedRoute = () => {
           return;
         }
 
+        console.log("Verifying token...");
         // Verify the token
-        const response = await axios.get("/api/auth/verify", {
+        const VITE_BASE_API =
+          import.meta.env.VITE_BASE_API || "http://localhost:3000/api";
+        const response = await axios.get(`${VITE_BASE_API}/auth/verify`, {
           headers: {
-            "x-auth-token": token,
+            Authorization: `Bearer ${token}`,
           },
         });
 
+        console.log("Token verification response:", response.data);
+
         // Check if verification was successful and registration is complete
         if (response.data.isValid) {
+          console.log("Token is valid!");
           setIsAuthenticated(true);
           setRegistrationComplete(true);
         } else {
           // Token is invalid
+          console.log("Token is invalid!");
           localStorage.removeItem("authToken");
           setIsAuthenticated(false);
         }
 
         setLoading(false);
       } catch (error) {
+        console.error(
+          "Authentication error details:",
+          error.response?.data || error.message
+        );
+
         // Handle different types of errors
         if (
           error.response &&
@@ -45,6 +58,7 @@ const ProtectedRoute = () => {
           error.response.data.registrationStatus === "incomplete"
         ) {
           // Registration is incomplete, user needs to subscribe
+          console.log("Registration incomplete, redirecting to payment");
           setIsAuthenticated(true);
           setRegistrationComplete(false);
           navigate("/payment");
