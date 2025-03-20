@@ -95,11 +95,11 @@ const RegisterForm = ({ onLoginClick }) => {
     setIsSubmitting(true);
     try {
       const userData = await signup(formData, null, setIsSubmitting);
-      navigate("/payment", { 
-        state: { 
+      navigate("/payment", {
+        state: {
           userData,
-          from: 'register'
-        } 
+          from: "register",
+        },
       });
     } catch (error) {
       console.error("Signup error:", error);
@@ -382,4 +382,18 @@ const RegisterForm = ({ onLoginClick }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-base font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:translate-y-[-2px] transition-all duration-200 ${
+                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSubmitting ? "Signing Up..." : "Sign Up"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default RegisterForm;
