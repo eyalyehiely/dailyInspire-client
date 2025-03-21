@@ -47,6 +47,7 @@ const UserPreferences = () => {
     variantId: "",
     userId: "",
     directCheckoutUrl: "",
+    subscriptionId: "",
   });
 
   // Add state for checkout URL
@@ -64,6 +65,9 @@ const UserPreferences = () => {
         if (!token) {
           throw new Error("Authentication token not found");
         }
+
+        // Log the token format to debug
+        console.log("Using auth token format:", token.substring(0, 10) + "...");
 
         const response = await axios.get(`${VITE_BASE_API}/auth/preferences`, {
           headers: {
@@ -90,9 +94,11 @@ const UserPreferences = () => {
         }
 
         console.log("Fetching subscription data...");
+
+        // Use correct header format based on API
         const response = await axios.get(`${VITE_BASE_API}/payments/status`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "x-auth-token": token,
           },
         });
 
@@ -101,31 +107,27 @@ const UserPreferences = () => {
         const checkoutId = response.data.checkoutId;
         setCheckoutId(checkoutId);
 
-        // Use the product and variant IDs from the server response instead of hardcoded values
+        // Update subscription data
         setSubscriptionData({
-          isPaid: response.data.isPaid,
+          isPaid: response.data.isPaid || false,
           subscriptionStatus: response.data.subscriptionStatus || "none",
-          productId: response.data.productId,
-          variantId: response.data.variantId,
-          userId: response.data.userId,
+          productId: response.data.productId || "",
+          variantId: response.data.variantId || "",
+          userId: response.data.userId || formData._id || "",
           directCheckoutUrl: response.data.directCheckoutUrl || "",
+          subscriptionId: response.data.subscriptionId || "",
         });
-        setLoading(false);
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError(
-          error.response?.data?.message ||
-            "Failed to load user preferences. Please try again."
-        );
-        setLoading(false);
+        console.error("Error fetching subscription data:", error);
+        // Don't set error for subscription data to allow preferences to still load
       }
     };
 
+    // Call both functions
     fetchPreferences();
-    fetchSubscriptionData(); // Call the new function
-  }, []);
+    fetchSubscriptionData();
 
-  useEffect(() => {
+    // Load LemonSqueezy checkout.js
     const script = document.createElement("script");
     script.src = "https://app.lemonsqueezy.com/js/checkout.js";
     script.async = true;
@@ -139,9 +141,11 @@ const UserPreferences = () => {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
-  }, []);
+  }, [VITE_BASE_API, formData._id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -257,7 +261,6 @@ const UserPreferences = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Add detailed logging to see what values we have
     console.log("===== SUBSCRIPTION DEBUG =====");
     console.log("Subscribe button clicked");
     console.log("subscriptionData:", subscriptionData);
@@ -266,49 +269,97 @@ const UserPreferences = () => {
     console.log("_id from form:", formData._id);
     console.log("===== END DEBUG =====");
 
-    // Use direct URL method only - more reliable
+    // Use direct URL method - more reliable
     try {
-      // Use the directCheckoutUrl from the server if available
-      if (subscriptionData.directCheckoutUrl) {
-        console.log(
-          "Using direct checkout URL from server:",
-          subscriptionData.directCheckoutUrl
-        );
-        window.location.href = subscriptionData.directCheckoutUrl;
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setError("Authentication required. Please log in again.");
         return false;
       }
 
-      // Fallback to constructing the URL ourselves
-      console.log("Constructing direct URL for checkout");
-      const storeName = "dailyinspire"; // Your Lemon Squeezy store name
+      console.log("Fetching checkout info...");
 
-      // Use hardcoded values if server doesn't return them
-      const productId = subscriptionData.productId || "471688";
-      const variantId = subscriptionData.variantId || "730358";
-      const userId = subscriptionData.userId || formData._id || "unknown";
+      // First try to get a fresh checkout URL from the server
+      axios
+        .get(`${VITE_BASE_API}/payments/checkout-info`, {
+          headers: {
+            "x-auth-token": token,
+          },
+        })
+        .then((response) => {
+          console.log("Checkout info response:", response.data);
 
-      console.log("Using IDs for checkout:", { productId, variantId, userId });
+          if (response.data.directCheckoutUrl) {
+            console.log(
+              "Using direct checkout URL from server:",
+              response.data.directCheckoutUrl
+            );
+            window.location.href = response.data.directCheckoutUrl;
+          } else {
+            // Fallback to our local URL construction
+            useFallbackCheckout();
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching checkout info:", error);
+          // Use fallback if API fails
+          useFallbackCheckout();
+        });
 
-      // Get the application URL from environment or window.location
-      const appUrl =
-        import.meta.env.VITE_APP_URL ||
-        `${window.location.protocol}//${window.location.host}`;
-
-      // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
-      const fallbackUrl = `https://${storeName}.lemonsqueezy.com/checkout/?variant=${variantId}&checkout[custom][user_id]=${userId}&checkout[success_url]=${encodeURIComponent(
-        `${appUrl}/payment-success`
-      )}&checkout[cancel_url]=${encodeURIComponent(`${appUrl}/preferences`)}`;
-
-      console.log("Navigating to URL:", fallbackUrl);
-
-      // Navigate directly - use location.href for full page navigation
-      window.location.href = fallbackUrl;
       return false;
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");
       return false;
     }
+  };
+
+  // Fallback checkout URL construction
+  const useFallbackCheckout = () => {
+    // Use the directCheckoutUrl from the state if available
+    if (subscriptionData.directCheckoutUrl) {
+      console.log(
+        "Using direct checkout URL from state:",
+        subscriptionData.directCheckoutUrl
+      );
+      window.location.href = subscriptionData.directCheckoutUrl;
+      return;
+    }
+
+    // Fallback to constructing the URL ourselves
+    console.log("Constructing direct URL for checkout");
+    const storeName = "dailyinspire"; // Your Lemon Squeezy store name
+
+    // Use hardcoded values if server doesn't return them
+    const productId = subscriptionData.productId || "471688";
+    const variantId = subscriptionData.variantId || "730358";
+    const userId =
+      subscriptionData.userId ||
+      formData._id ||
+      localStorage.getItem("userId") ||
+      "unknown";
+
+    console.log("Using IDs for checkout:", { productId, variantId, userId });
+
+    // Get the application URL from environment or window.location
+    const appUrl =
+      import.meta.env.VITE_APP_URL ||
+      `${window.location.protocol}//${window.location.host}`;
+
+    // Format: https://[store].lemonsqueezy.com/checkout/buy/[product]?variant=[variant]
+    const fallbackUrl = `https://${storeName}.lemonsqueezy.com/buy/${variantId}?checkout[custom][user_id]=${encodeURIComponent(
+      userId
+    )}&checkout[success_url]=${encodeURIComponent(
+      `${appUrl}/payment-success`
+    )}&checkout[cancel_url]=${encodeURIComponent(`${appUrl}/preferences`)}`;
+
+    console.log("Navigating to URL:", fallbackUrl);
+
+    // Store user ID in localStorage as backup
+    localStorage.setItem("userId", userId);
+
+    // Navigate directly - use location.href for full page navigation
+    window.location.href = fallbackUrl;
   };
 
   if (loading && !formData.email) {
