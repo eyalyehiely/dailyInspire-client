@@ -149,10 +149,9 @@ const PaymentPage = () => {
 
       console.log("Final user ID for checkout:", currentUserId);
 
-      // For 100% sure we have a variant ID
-      const currentVariantId =
-        variantId || "9e44dcc7-edab-43f0-b9a2-9d663d4af336";
-      console.log("Using variant ID:", currentVariantId);
+      // Use the variant slug instead of the ID
+      const variantSlug = "9e44dcc7-edab-43f0-b9a2-9d663d4af336";
+      console.log("Using variant slug:", variantSlug);
 
       // Store in local storage for potential webhook fallback
       localStorage.setItem("userId", currentUserId);
@@ -169,19 +168,22 @@ const PaymentPage = () => {
 
       // Build the URL with the correct format as fallback
       // Base URL must include the variant ID in the path
-      const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${currentVariantId}`;
+      const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${variantSlug}`;
 
       // Get the application URL from environment or window.location
       const appUrl =
         import.meta.env.VITE_APP_URL ||
         `${window.location.protocol}//${window.location.host}`;
 
-      // Properly formatted query string with ? separator
-      const finalUrl = `${baseUrl}?checkout[custom][user_id]=${encodeURIComponent(
-        currentUserId
-      )}&discount=0&checkout[success_url]=${encodeURIComponent(
-        `${appUrl}/payment-success`
-      )}&checkout[cancel_url]=${encodeURIComponent(`${appUrl}/payment`)}`;
+      // Create a URLSearchParams object for proper parameter encoding
+      const params = new URLSearchParams();
+      params.append("checkout[custom][user_id]", currentUserId);
+      params.append("discount", "0");
+      params.append("checkout[success_url]", `${appUrl}/payment-success`);
+      params.append("checkout[cancel_url]", `${appUrl}/payment`);
+
+      // Use the encoded search string
+      const finalUrl = `${baseUrl}?${params.toString()}`;
 
       console.log("Final checkout URL:", finalUrl);
 
