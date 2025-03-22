@@ -60,6 +60,9 @@ const UserPreferences = () => {
   // Add state to track if checkout.js is loaded
   const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
 
+  // Add subscription check flag to prevent duplicate redirects
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
+
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
@@ -89,7 +92,6 @@ const UserPreferences = () => {
       }
     };
 
-    // Add a function to fetch subscription data
     const fetchSubscriptionData = async () => {
       try {
         const token = localStorage.getItem("authToken");
@@ -133,6 +135,20 @@ const UserPreferences = () => {
         console.log("Setting subscription data:", newSubscriptionData);
         setSubscriptionData(newSubscriptionData);
 
+        // Check subscription status and redirect if not paid
+        const isPaid = response.data.isPay;
+        const status = response.data.subscriptionStatus;
+
+        // Only allow users with active subscriptions to access preferences
+        if (!isPaid || (status !== "active" && status !== "cancelled")) {
+          console.log(
+            "User does not have an active subscription, redirecting to payment page"
+          );
+          navigate("/payment");
+        }
+
+        setSubscriptionChecked(true);
+
         // Log subscription data state after update
         setTimeout(() => {
           console.log("Current subscriptionData state:", subscriptionData);
@@ -165,7 +181,7 @@ const UserPreferences = () => {
         document.body.removeChild(script);
       }
     };
-  }, [VITE_BASE_API, formData._id]);
+  }, [VITE_BASE_API, formData._id, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -390,6 +406,33 @@ const UserPreferences = () => {
                       <p className="text-sm text-gray-600 mb-4">
                         {getSubscriptionStatusDisplay().description}
                       </p>
+
+                      {subscriptionData.subscriptionStatus === "cancelled" && (
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md mb-4">
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0 pt-0.5">
+                              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                            </div>
+                            <div className="ml-3">
+                              <p className="text-sm text-yellow-600 font-medium">
+                                Your subscription has been cancelled
+                              </p>
+                              <p className="text-sm text-yellow-600 mt-1">
+                                You will continue to receive quotes until the
+                                end of your billing period. After that, quotes
+                                will be disabled until you resubscribe.
+                              </p>
+                              <button
+                                onClick={handleSubscribeClick}
+                                type="button"
+                                className="mt-2 text-sm px-3 py-1.5 border border-yellow-300 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors"
+                              >
+                                Reactivate Subscription
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {subscriptionData.subscriptionStatus === "active" && (
                         <>
