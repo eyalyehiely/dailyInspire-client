@@ -98,7 +98,8 @@ const UserPreferences = () => {
         // Use correct header format based on API
         const response = await axios.get(`${VITE_BASE_API}/payments/status`, {
           headers: {
-            "x-auth-token": token,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
 
