@@ -257,7 +257,7 @@ const UserPreferences = () => {
 
   // Function to handle subscription checkout
   const handleSubscribeClick = (e) => {
-       window.location.href=import.meta.env.CHECKOUT_URL
+       windowlocation.href=import.meta.env.CHECKOUT_URL
   };
 
 
