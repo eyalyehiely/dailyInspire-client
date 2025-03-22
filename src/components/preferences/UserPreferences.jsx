@@ -48,6 +48,10 @@ const UserPreferences = () => {
     userId: "",
     directCheckoutUrl: "",
     subscriptionId: "",
+    cardBrand: "",
+    cardLastFour: "",
+    customerPortalUrl: "",
+    cancelSubscriptionUrl: "",
   });
 
   // Add state for checkout URL
@@ -117,6 +121,10 @@ const UserPreferences = () => {
           userId: response.data.userId || formData._id || "",
           directCheckoutUrl: response.data.directCheckoutUrl || "",
           subscriptionId: response.data.subscriptionId || "",
+          cardBrand: response.data.cardBrand || "",
+          cardLastFour: response.data.cardLastFour || "",
+          customerPortalUrl: response.data.customerPortalUrl || "",
+          cancelSubscriptionUrl: response.data.cancelSubscriptionUrl || "",
         });
       } catch (error) {
         console.error("Error fetching subscription data:", error);
@@ -256,6 +264,34 @@ const UserPreferences = () => {
     }
   };
 
+  // Function to format card brand for display
+  const formatCardBrand = (brand) => {
+    if (!brand) return "";
+    return brand.charAt(0).toUpperCase() + brand.slice(1);
+  };
+
+  // Function to handle subscription cancellation
+  const handleCancelSubscription = () => {
+    if (subscriptionData.cancelSubscriptionUrl) {
+      window.open(subscriptionData.cancelSubscriptionUrl, "_blank");
+    } else if (subscriptionData.customerPortalUrl) {
+      window.open(subscriptionData.customerPortalUrl, "_blank");
+    } else {
+      setError(
+        "Unable to access subscription management. Please contact support."
+      );
+    }
+  };
+
+  // Function to handle opening customer portal
+  const handleManageSubscription = () => {
+    if (subscriptionData.customerPortalUrl) {
+      window.open(subscriptionData.customerPortalUrl, "_blank");
+    } else {
+      setError("Unable to access customer portal. Please contact support.");
+    }
+  };
+
   // Function to handle subscription checkout
   const handleSubscribeClick = (e) => {
     window.location.href = import.meta.env.CHECKOUT_URL;
@@ -345,14 +381,49 @@ const UserPreferences = () => {
                       </p>
 
                       {subscriptionData.subscriptionStatus === "active" && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">
-                            Plan
-                          </span>
-                          <span className="text-sm font-medium text-gray-700">
-                            Premium ($1.99/month)
-                          </span>
-                        </div>
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">
+                              Plan
+                            </span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Premium ($1.99/month)
+                            </span>
+                          </div>
+
+                          {/* Payment Method Information */}
+                          {subscriptionData.cardBrand &&
+                            subscriptionData.cardLastFour && (
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-sm font-medium text-gray-700">
+                                  Payment Method
+                                </span>
+                                <span className="text-sm font-medium text-gray-700">
+                                  {formatCardBrand(subscriptionData.cardBrand)}{" "}
+                                  •••• {subscriptionData.cardLastFour}
+                                </span>
+                              </div>
+                            )}
+
+                          {/* Subscription Management Buttons */}
+                          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                            <button
+                              onClick={handleManageSubscription}
+                              type="button"
+                              className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
+                            >
+                              Manage Subscription
+                            </button>
+
+                            <button
+                              onClick={handleCancelSubscription}
+                              type="button"
+                              className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                            >
+                              Cancel Subscription
+                            </button>
+                          </div>
+                        </>
                       )}
                     </>
                   ) : (
