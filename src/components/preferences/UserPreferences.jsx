@@ -109,7 +109,7 @@ const UserPreferences = () => {
 
         // Update subscription data
         setSubscriptionData({
-          isPaid: response.data.isPaid || false,
+          isPaid: response.data.isPay || false,
           subscriptionStatus: response.data.subscriptionStatus || "none",
           productId: response.data.productId || "",
           variantId: response.data.variantId || "",
