@@ -41,7 +41,7 @@ const UserPreferences = () => {
 
   // Add subscription status state
   const [subscriptionData, setSubscriptionData] = useState({
-    isPaid: false,
+    isPay: false,
     subscriptionStatus: "none",
     productId: "",
     variantId: "",
@@ -108,13 +108,16 @@ const UserPreferences = () => {
         });
 
         console.log("Subscription data response:", response.data);
+        // Add more detailed logging
+        console.log("isPaid from response:", response.data.isPaid);
+        console.log("isPay from response:", response.data.isPay);
 
         const checkoutId = response.data.checkoutId;
         setCheckoutId(checkoutId);
 
-        // Update subscription data
-        setSubscriptionData({
-          isPaid: response.data.isPay || false,
+        // Update subscription data with correct property name
+        const newSubscriptionData = {
+          isPay: response.data.isPay || false,
           subscriptionStatus: response.data.subscriptionStatus || "none",
           productId: response.data.productId || "",
           variantId: response.data.variantId || "",
@@ -125,7 +128,15 @@ const UserPreferences = () => {
           cardLastFour: response.data.cardLastFour || "",
           customerPortalUrl: response.data.customerPortalUrl || "",
           cancelSubscriptionUrl: response.data.cancelSubscriptionUrl || "",
-        });
+        };
+
+        console.log("Setting subscription data:", newSubscriptionData);
+        setSubscriptionData(newSubscriptionData);
+
+        // Log subscription data state after update
+        setTimeout(() => {
+          console.log("Current subscriptionData state:", subscriptionData);
+        }, 100);
       } catch (error) {
         console.error("Error fetching subscription data:", error);
         // Don't set error for subscription data to allow preferences to still load
@@ -362,7 +373,7 @@ const UserPreferences = () => {
                 </h3>
 
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  {subscriptionData.isPaid ? (
+                  {subscriptionData.isPay ? (
                     <>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-gray-700">
