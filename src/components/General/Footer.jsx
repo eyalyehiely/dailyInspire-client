@@ -89,15 +89,6 @@ const Footer = () => {
                   support@dailyinspire.xyz
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-base text-gray-300 hover:text-white transition-colors duration-200 flex items-center"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Help Center
-                </a>
-              </li>
             </ul>
           </div>
 
