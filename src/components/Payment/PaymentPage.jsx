@@ -168,7 +168,8 @@ const PaymentPage = () => {
 
       // Build the URL with the correct format as fallback
       // Base URL must include the variant ID in the path
-      const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${variantSlug}`;
+      // const baseUrl = `https://dailyinspire.lemonsqueezy.com/buy/${variantSlug}`;
+      const baseUrl = ``;
 
       // Get the application URL from environment or window.location
       const appUrl =
@@ -484,7 +485,7 @@ const PaymentPage = () => {
           </button>
 
           {/* Test link for debugging */}
-          <div className="mt-4 text-xs text-center">
+          {/* <div className="mt-4 text-xs text-center">
             <a
               href={`https://dailyinspire.lemonsqueezy.com/buy/9e44dcc7-edab-43f0-b9a2-9d663d4af336?checkout[custom][user_id]=${encodeURIComponent(
                 userId || "test"
@@ -495,7 +496,7 @@ const PaymentPage = () => {
             >
               Test Direct Checkout Link
             </a>
-          </div>
+          </div> */}
 
           <p className="text-center text-sm text-gray-500 mt-4">
             By proceeding, you agree to our Terms of Service and Privacy Policy.
