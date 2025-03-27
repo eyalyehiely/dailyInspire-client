@@ -131,6 +131,19 @@ const TermsOfService = () => {
 
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4 text-indigo-600">
+            Refund Policy
+          </h2>
+          <p className="text-gray-700 mb-4">
+            DailyInspire does not offer refunds for subscription payments. If
+            you wish to stop using our services, you may cancel your
+            subscription at any time. Upon cancellation, you will continue to
+            have access to the service until the end of your current billing
+            period.
+          </p>
+        </div>
+
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-indigo-600">
             Contact Us
           </h2>
           <p className="text-gray-700 mb-4">
