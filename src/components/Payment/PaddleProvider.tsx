@@ -37,7 +37,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     const script = document.createElement('script');
     // Use the correct script URL from environment variables
-    script.src = import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE + '/paddle.js';
+    script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
     script.async = true;
     
     script.onload = () => {
