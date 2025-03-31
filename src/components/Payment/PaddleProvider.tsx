@@ -29,10 +29,12 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
     script.async = true;
     script.onload = () => {
+      // Set environment first
       window.Paddle.Environment.set('sandbox');
+      
+      // Then setup with minimal configuration
       window.Paddle.Setup({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        environment: 'sandbox',
         checkout: {
           theme: 'light',
           locale: 'en',
