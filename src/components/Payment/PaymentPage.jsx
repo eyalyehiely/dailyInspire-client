@@ -73,7 +73,7 @@ const PaymentPage = () => {
           // Set environment first
           window.Paddle.Environment.set("live");
 
-          // Then setup with minimal configuration
+          // Then setup with minimal configuration and disable Profitwell
           window.Paddle.Setup({
             token: clientToken,
             checkout: {
@@ -82,7 +82,16 @@ const PaymentPage = () => {
               successUrl: `${window.location.origin}/payment-success`,
               closeOnSuccess: true,
             },
+            settings: {
+              disableAnalytics: true,
+              disableProfitwell: true,
+            },
           });
+
+          // Verify Paddle is properly initialized
+          if (typeof window.Paddle.Checkout === "undefined") {
+            throw new Error("Paddle Checkout not properly initialized");
+          }
 
           console.log("Paddle initialized successfully");
           setCheckoutJsLoaded(true);
@@ -107,7 +116,10 @@ const PaymentPage = () => {
         document.body.removeChild(existingScript);
       }
 
-      document.body.appendChild(script);
+      // Add a small delay before adding the script
+      setTimeout(() => {
+        document.body.appendChild(script);
+      }, 100);
 
       // Fetch checkout info
       try {
