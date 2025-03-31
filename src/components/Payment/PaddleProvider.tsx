@@ -64,6 +64,12 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             quantity: 1,
           },
         ],
+        checkout: {
+          theme: 'light',
+          locale: 'en',
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
+          closeOnSuccess: true,
+        },
       });
     } catch (error) {
       console.error('Error opening checkout:', error);
