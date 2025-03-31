@@ -48,7 +48,10 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         // Store user data and token in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
         if (data.token) {
-            localStorage.setItem('authToken', data.token);
+            // Ensure token is properly formatted
+            const token = data.token.startsWith('Bearer ') ? data.token : `Bearer ${data.token}`;
+            localStorage.setItem('authToken', token);
+            console.log("Token stored:", token);
             // Add a small delay to ensure token is stored
             await new Promise(resolve => setTimeout(resolve, 100));
         }

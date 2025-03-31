@@ -33,6 +33,7 @@ const PaymentPage = () => {
       // If no auth token, redirect to register
       const token = localStorage.getItem("authToken");
       if (!token) {
+        console.log("No auth token found, redirecting to register");
         navigate("/register");
         return;
       }
@@ -62,9 +63,6 @@ const PaymentPage = () => {
               eventCallback: (data) => {
                 console.log("Paddle event:", data);
               },
-              profitwell: {
-                enabled: false,
-              },
             });
             setCheckoutJsLoaded(true);
           } catch (error) {
@@ -86,11 +84,12 @@ const PaymentPage = () => {
 
       // Fetch checkout info
       try {
+        console.log("Fetching checkout info with token:", token);
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
             headers: {
-              "x-auth-token": token,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,
@@ -112,7 +111,7 @@ const PaymentPage = () => {
       } catch (error) {
         console.error("Error fetching checkout info:", error);
         if (error.response?.status === 401) {
-          // Token is invalid or expired
+          console.log("Token is invalid or expired, redirecting to register");
           localStorage.removeItem("authToken");
           navigate("/register");
         } else {
