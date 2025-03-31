@@ -149,7 +149,7 @@ const PaymentPage = () => {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: priceId,
+            priceId: import.meta.env.VITE_PADDLE_PRICE_ID,
             quantity: 1,
           },
         ],
