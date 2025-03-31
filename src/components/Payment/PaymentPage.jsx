@@ -121,9 +121,13 @@ const PaymentPage = () => {
       // If no direct URL, construct one using environment variables
       const appUrl = import.meta.env.VITE_APP_URL;
       const paddleCheckoutUrl = import.meta.env.VITE_PADDLE_CHECKOUT_URL;
+      const envProductId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
+
+      // Use product ID from server response or fallback to environment variable
+      const finalProductId = productId || envProductId;
 
       // Ensure we have a product ID
-      if (!productId) {
+      if (!finalProductId) {
         console.error("No product ID available");
         setError("Unable to generate checkout URL. Please try again later.");
         return;
@@ -131,7 +135,7 @@ const PaymentPage = () => {
 
       // Construct the URL with the correct Paddle format
       const params = new URLSearchParams({
-        "items[0][price_id]": productId,
+        "items[0][price_id]": finalProductId,
         "items[0][quantity]": "1",
         customer_id: currentUserId,
         success_url: `${appUrl}/payment-success`,
