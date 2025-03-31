@@ -99,14 +99,18 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
       
       window.Paddle.Checkout.open({
-        product: import.meta.env.VITE_PADDLE_PRODUCT_ID,
-        price: priceId,
-        successCallback: function(data: any) {
-          console.log('PaddleProvider: Checkout success:', data);
-          window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success`;
-        },
-        closeCallback: function() {
-          console.log('PaddleProvider: Checkout closed');
+        items: [{
+          priceId: priceId,
+          quantity: 1
+        }],
+        settings: {
+          theme: 'light',
+          displayMode: 'inline',
+          locale: 'en',
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
+          closeCallback: function() {
+            console.log('PaddleProvider: Checkout closed');
+          }
         }
       });
     } catch (error) {
