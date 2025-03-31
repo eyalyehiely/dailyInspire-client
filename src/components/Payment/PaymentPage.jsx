@@ -45,9 +45,9 @@ const PaymentPage = () => {
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
       if (clientToken) {
         try {
+          window.Paddle.Environment.set("live");
           window.Paddle.Setup({
             token: clientToken,
-            environment: "live",
             checkout: {
               frontendBase: import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
               backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
@@ -121,6 +121,7 @@ const PaymentPage = () => {
       // Get client token from environment variables
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
       const productId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
+      const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
 
       if (!clientToken || !productId) {
         setError(
