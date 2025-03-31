@@ -65,7 +65,15 @@ const PaymentPage = () => {
         }
 
         try {
+          // Wait for Paddle to be fully loaded
+          if (typeof window.Paddle === "undefined") {
+            throw new Error("Paddle is not loaded yet");
+          }
+
+          // Set environment first
           window.Paddle.Environment.set("live");
+
+          // Then setup with minimal configuration
           window.Paddle.Setup({
             token: clientToken,
             checkout: {
@@ -75,6 +83,7 @@ const PaymentPage = () => {
               closeOnSuccess: true,
             },
           });
+
           console.log("Paddle initialized successfully");
           setCheckoutJsLoaded(true);
         } catch (error) {
@@ -86,10 +95,18 @@ const PaymentPage = () => {
           );
         }
       };
-      script.onerror = () => {
-        console.error("Failed to load Paddle checkout.js");
+
+      script.onerror = (error) => {
+        console.error("Failed to load Paddle checkout.js:", error);
         setError("Failed to load payment system. Please try again later.");
       };
+
+      // Remove any existing Paddle script
+      const existingScript = document.querySelector('script[src*="paddle.js"]');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+
       document.body.appendChild(script);
 
       // Fetch checkout info
@@ -145,8 +162,9 @@ const PaymentPage = () => {
 
   const handleProceedToPayment = () => {
     try {
-      if (!window.Paddle) {
-        console.error("Paddle is not initialized");
+      // Check if Paddle is loaded and initialized
+      if (typeof window.Paddle === "undefined") {
+        console.error("Paddle is not loaded");
         setError("Payment system not ready. Please try again.");
         return;
       }
@@ -186,7 +204,7 @@ const PaymentPage = () => {
         return;
       }
 
-      // Initialize Paddle checkout
+      // Initialize Paddle checkout with minimal configuration
       window.Paddle.Checkout.open({
         items: [
           {
@@ -223,9 +241,9 @@ const PaymentPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header />
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <RefreshCw className="animate-spin h-8 w-8 mx-auto text-gray-400" />
             <p className="mt-2 text-gray-500">Loading payment information...</p>
@@ -236,16 +254,16 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+      <div className="flex-1 flex items-center justify-center py-12">
+        <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 text-center">
                 Upgrade to Premium
               </h3>
-              <div className="mt-2 max-w-xl text-sm text-gray-500">
+              <div className="mt-2 max-w-xl text-sm text-gray-500 mx-auto text-center">
                 <p>
                   Get access to all premium features and unlimited daily quotes.
                 </p>
@@ -291,7 +309,7 @@ const PaymentPage = () => {
                   </div>
                 </div>
               )}
-              <div className="mt-5">
+              <div className="mt-5 flex justify-center">
                 <button
                   onClick={handleProceedToPayment}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
