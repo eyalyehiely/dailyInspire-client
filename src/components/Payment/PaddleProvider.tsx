@@ -36,7 +36,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle.js';
+    // Use the correct script URL from environment variables
+    script.src = import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE + '/paddle.js';
     script.async = true;
     
     script.onload = () => {
@@ -46,15 +47,16 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     script.onerror = (error) => {
       console.error('PaddleProvider: Failed to load Paddle script:', error);
-      setError('Failed to load payment system');
+      setError('Failed to load payment system. Please check your internet connection and try again.');
     };
 
-    document.body.appendChild(script);
+    // Add script to head instead of body
+    document.head.appendChild(script);
 
     return () => {
       const scriptElement = document.querySelector('script[src*="paddle.js"]');
       if (scriptElement) {
-        document.body.removeChild(scriptElement);
+        document.head.removeChild(scriptElement);
       }
     };
   }, []);
@@ -62,6 +64,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const setupPaddle = () => {
     try {
       console.log('PaddleProvider: Setting up Paddle...');
+      console.log('PaddleProvider: Using client token:', import.meta.env.VITE_PADDLE_CLIENT_TOKEN);
+      
       window.Paddle.Setup({
         vendor: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
         eventCallback: function(data: any) {
@@ -72,7 +76,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsPaddleLoaded(true);
     } catch (error) {
       console.error('PaddleProvider: Error setting up Paddle:', error);
-      setError('Failed to initialize payment system');
+      setError('Failed to initialize payment system. Please try again later.');
     }
   };
 
@@ -92,6 +96,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     try {
       console.log('PaddleProvider: Opening checkout...');
+      console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
+      
       window.Paddle.Checkout.open({
         product: import.meta.env.VITE_PADDLE_PRODUCT_ID,
         price: priceId,
