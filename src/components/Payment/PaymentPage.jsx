@@ -51,6 +51,10 @@ const PaymentPage = () => {
             checkout: {
               frontendBase: import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
               backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
+              theme: "light",
+              locale: "en",
+              successUrl: `${window.location.origin}/payment-success`,
+              closeOnSuccess: true,
             },
             eventCallback: (data) => {
               console.log("Paddle event:", data);
@@ -79,9 +83,12 @@ const PaymentPage = () => {
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
-        const response = await axios.get("/api/payments/checkout-info", {
-          headers: { "x-auth-token": token },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
+          {
+            headers: { "x-auth-token": token },
+          }
+        );
 
         console.log("Checkout info response:", response.data);
 
@@ -134,7 +141,7 @@ const PaymentPage = () => {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: productId,
+            priceId: priceId,
             quantity: 1,
           },
         ],
