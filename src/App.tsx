@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { PaddleProvider } from "./components/payment/PaddleProvider";
 
 // General:
 import PageTitle from "./components/General/PageTitle.js";
@@ -41,7 +42,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <PaddleProvider>
       <Routes>
         {/* Public routes */}
         <Route
@@ -204,7 +205,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </PaddleProvider>
   );
 }
 
