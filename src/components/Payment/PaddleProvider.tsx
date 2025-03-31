@@ -104,7 +104,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           quantity: 1
         }],
         settings: {
-          theme: 'light',
+          theme: 'dark',
           displayMode: 'inline',
           locale: 'en',
           successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
