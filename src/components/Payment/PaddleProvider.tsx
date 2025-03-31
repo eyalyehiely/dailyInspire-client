@@ -23,29 +23,58 @@ export const usePaddle = () => {
 
 export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isPaddleLoaded, setIsPaddleLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('PaddleProvider: Initializing Paddle...');
+    
+    // Check if Paddle is already loaded
+    if (window.Paddle) {
+      console.log('PaddleProvider: Paddle already loaded, setting up...');
+      setupPaddle();
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://cdn.paddle.com/paddle.js';
     script.async = true;
+    
     script.onload = () => {
-      console.log('PaddleProvider: Script loaded, setting up Paddle...');
+      console.log('PaddleProvider: Script loaded successfully');
+      setupPaddle();
+    };
+
+    script.onerror = (error) => {
+      console.error('PaddleProvider: Failed to load Paddle script:', error);
+      setError('Failed to load payment system');
+    };
+
+    document.body.appendChild(script);
+
+    return () => {
+      const scriptElement = document.querySelector('script[src*="paddle.js"]');
+      if (scriptElement) {
+        document.body.removeChild(scriptElement);
+      }
+    };
+  }, []);
+
+  const setupPaddle = () => {
+    try {
+      console.log('PaddleProvider: Setting up Paddle...');
       window.Paddle.Setup({
         vendor: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
         eventCallback: function(data: any) {
           console.log('PaddleProvider: Paddle event:', data);
         }
       });
-      console.log('PaddleProvider: Setup complete, setting isPaddleLoaded to true');
+      console.log('PaddleProvider: Setup complete');
       setIsPaddleLoaded(true);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+    } catch (error) {
+      console.error('PaddleProvider: Error setting up Paddle:', error);
+      setError('Failed to initialize payment system');
+    }
+  };
 
   const openCheckout = async (priceId: string) => {
     console.log('PaddleProvider: openCheckout called with priceId:', priceId);
@@ -54,6 +83,11 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!isPaddleLoaded) {
       console.error('PaddleProvider: Paddle is not loaded yet');
       throw new Error('Paddle is not loaded yet');
+    }
+
+    if (!window.Paddle) {
+      console.error('PaddleProvider: Paddle object not found');
+      throw new Error('Payment system not initialized');
     }
 
     try {
@@ -74,6 +108,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       throw error;
     }
   };
+
+  if (error) {
+    console.error('PaddleProvider: Error state:', error);
+  }
 
   return (
     <PaddleContext.Provider value={{ isPaddleLoaded, openCheckout }}>
