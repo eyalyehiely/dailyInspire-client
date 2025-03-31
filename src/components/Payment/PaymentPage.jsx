@@ -42,73 +42,18 @@ const PaymentPage = () => {
       const script = document.createElement("script");
       script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
       script.async = true;
-      script.onload = () => {
-        console.log("Paddle checkout.js loaded");
-        // Initialize Paddle with the client token
-        const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
-        const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
 
-        console.log("Initializing Paddle with:", {
-          clientToken: clientToken ? "present" : "missing",
-          priceId: priceId ? "present" : "missing",
-        });
-
-        if (!clientToken || !priceId) {
-          console.error("Missing required configuration:", {
-            clientToken: !!clientToken,
-            priceId: !!priceId,
-          });
-          setError(
-            "Payment system configuration is missing. Please try again later."
-          );
-          return;
-        }
-
-        try {
-          // Wait for Paddle to be fully loaded
-          if (typeof window.Paddle === "undefined") {
-            throw new Error("Paddle is not loaded yet");
-          }
-
-          // Set environment first
-          window.Paddle.Environment.set("live");
-
-          // Then setup with minimal configuration and disable Profitwell
-          window.Paddle.Setup({
-            token: clientToken,
-            checkout: {
-              theme: "light",
-              locale: "en",
-              successUrl: `${window.location.origin}/payment-success`,
-              closeOnSuccess: true,
-            },
-            settings: {
-              disableAnalytics: true,
-              disableProfitwell: true,
-            },
-          });
-
-          // Verify Paddle is properly initialized
-          if (typeof window.Paddle.Checkout === "undefined") {
-            throw new Error("Paddle Checkout not properly initialized");
-          }
-
-          console.log("Paddle initialized successfully");
-          setCheckoutJsLoaded(true);
-        } catch (error) {
-          console.error("Error initializing Paddle:", error);
-          setError(
-            `Failed to initialize payment system: ${
-              error.message || "Unknown error"
-            }`
-          );
-        }
-      };
-
-      script.onerror = (error) => {
-        console.error("Failed to load Paddle checkout.js:", error);
-        setError("Failed to load payment system. Please try again later.");
-      };
+      // Create a promise to handle script loading
+      const scriptLoadPromise = new Promise((resolve, reject) => {
+        script.onload = () => {
+          console.log("Paddle checkout.js loaded");
+          resolve();
+        };
+        script.onerror = (error) => {
+          console.error("Failed to load Paddle checkout.js:", error);
+          reject(error);
+        };
+      });
 
       // Remove any existing Paddle script
       const existingScript = document.querySelector('script[src*="paddle.js"]');
@@ -116,10 +61,76 @@ const PaymentPage = () => {
         document.body.removeChild(existingScript);
       }
 
-      // Add a small delay before adding the script
-      setTimeout(() => {
-        document.body.appendChild(script);
-      }, 100);
+      // Add the script to the document
+      document.body.appendChild(script);
+
+      // Wait for script to load before initializing
+      scriptLoadPromise
+        .then(() => {
+          // Initialize Paddle with the client token
+          const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+          const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
+
+          console.log("Initializing Paddle with:", {
+            clientToken: clientToken ? "present" : "missing",
+            priceId: priceId ? "present" : "missing",
+          });
+
+          if (!clientToken || !priceId) {
+            console.error("Missing required configuration:", {
+              clientToken: !!clientToken,
+              priceId: !!priceId,
+            });
+            setError(
+              "Payment system configuration is missing. Please try again later."
+            );
+            return;
+          }
+
+          try {
+            // Wait for Paddle to be fully loaded
+            if (typeof window.Paddle === "undefined") {
+              throw new Error("Paddle is not loaded yet");
+            }
+
+            // Set environment first
+            window.Paddle.Environment.set("live");
+
+            // Then setup with minimal configuration and disable Profitwell
+            window.Paddle.Setup({
+              token: clientToken,
+              checkout: {
+                theme: "light",
+                locale: "en",
+                successUrl: `${window.location.origin}/payment-success`,
+                closeOnSuccess: true,
+              },
+              settings: {
+                disableAnalytics: true,
+                disableProfitwell: true,
+              },
+            });
+
+            // Verify Paddle is properly initialized
+            if (typeof window.Paddle.Checkout === "undefined") {
+              throw new Error("Paddle Checkout not properly initialized");
+            }
+
+            console.log("Paddle initialized successfully");
+            setCheckoutJsLoaded(true);
+          } catch (error) {
+            console.error("Error initializing Paddle:", error);
+            setError(
+              `Failed to initialize payment system: ${
+                error.message || "Unknown error"
+              }`
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to load Paddle script:", error);
+          setError("Failed to load payment system. Please try again later.");
+        });
 
       // Fetch checkout info
       try {
