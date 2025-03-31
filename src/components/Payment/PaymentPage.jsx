@@ -59,6 +59,9 @@ const PaymentPage = () => {
             eventCallback: (data) => {
               console.log("Paddle event:", data);
             },
+            profitwell: {
+              enabled: false,
+            },
           });
           setCheckoutJsLoaded(true);
         } catch (error) {
@@ -83,10 +86,21 @@ const PaymentPage = () => {
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("No auth token found");
+          navigate("/register");
+          return;
+        }
+
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
-            headers: { "x-auth-token": token },
+            headers: {
+              "x-auth-token": token,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
           }
         );
 
@@ -104,7 +118,13 @@ const PaymentPage = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching checkout info:", error);
-        setError("Failed to load payment information");
+        if (error.response?.status === 401) {
+          // Token is invalid or expired
+          localStorage.removeItem("authToken");
+          navigate("/register");
+        } else {
+          setError("Failed to load payment information");
+        }
         setLoading(false);
       }
     };
@@ -127,10 +147,9 @@ const PaymentPage = () => {
 
       // Get client token from environment variables
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
-      const productId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
       const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
 
-      if (!clientToken || !productId) {
+      if (!clientToken || !priceId) {
         setError(
           "Payment system configuration is missing. Please try again later."
         );
