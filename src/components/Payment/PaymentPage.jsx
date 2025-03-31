@@ -44,19 +44,25 @@ const PaymentPage = () => {
       // Initialize Paddle with the client token
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
       if (clientToken) {
-        window.Paddle.Environment.set("live");
-        window.Paddle.Setup({
-          token: clientToken,
-          environment: "live",
-          checkout: {
-            frontendBase: import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
-            backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
-          },
-          eventCallback: (data) => {
-            console.log("Paddle event:", data);
-          },
-        });
-        setCheckoutJsLoaded(true);
+        try {
+          window.Paddle.Setup({
+            token: clientToken,
+            environment: "live",
+            checkout: {
+              frontendBase: import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
+              backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
+            },
+            eventCallback: (data) => {
+              console.log("Paddle event:", data);
+            },
+          });
+          setCheckoutJsLoaded(true);
+        } catch (error) {
+          console.error("Error initializing Paddle:", error);
+          setError(
+            "Failed to initialize payment system. Please try again later."
+          );
+        }
       } else {
         console.error("Missing Paddle client token");
         setError(
