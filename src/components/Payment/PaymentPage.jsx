@@ -47,7 +47,6 @@ const PaymentPage = () => {
         window.Paddle.Environment.set("live");
         window.Paddle.Setup({
           token: clientToken,
-          environment: "live",
           eventCallback: (data) => {
             console.log("Paddle event:", data);
           },
