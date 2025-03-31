@@ -110,12 +110,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
-          },
-          position: 'center',
-          width: '100%',
-          maxWidth: '600px',
-          height: 'auto',
-          maxHeight: '90vh'
+          }
         }
       });
     } catch (error) {
