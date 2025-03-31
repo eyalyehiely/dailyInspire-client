@@ -52,16 +52,10 @@ const PaymentPage = () => {
             window.Paddle.Setup({
               token: clientToken,
               checkout: {
-                frontendBase: import.meta.env
-                  .VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
-                backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
                 theme: "light",
                 locale: "en",
                 successUrl: `${window.location.origin}/payment-success`,
                 closeOnSuccess: true,
-              },
-              eventCallback: (data) => {
-                console.log("Paddle event:", data);
               },
             });
             setCheckoutJsLoaded(true);
@@ -162,6 +156,10 @@ const PaymentPage = () => {
         customData: {
           userId: userId,
         },
+        theme: "light",
+        locale: "en",
+        successUrl: `${window.location.origin}/payment-success`,
+        closeOnSuccess: true,
         success: (data) => {
           console.log("Checkout successful:", data);
           navigate("/payment-success");
