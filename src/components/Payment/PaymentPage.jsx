@@ -43,6 +43,7 @@ const PaymentPage = () => {
         });
 
         console.log("Checkout info response:", response.data);
+        console.log("Product ID from response:", response.data.productId);
 
         if (response.data.isPaid) {
           console.log("User already has premium access");
@@ -52,6 +53,7 @@ const PaymentPage = () => {
 
         setUserId(response.data.userId);
         setProductId(response.data.productId);
+        console.log("Setting product ID in state:", response.data.productId);
         setDirectCheckoutUrl(response.data.directCheckoutUrl);
         setSubscriptionStatus(response.data.subscriptionStatus);
         setLoading(false);
