@@ -26,23 +26,13 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+    script.src = 'https://cdn.paddle.com/paddle.js';
     script.async = true;
     script.onload = () => {
-      // Set environment first
-      window.Paddle.Environment.set('live');
-      
-      // Then setup with minimal configuration
       window.Paddle.Setup({
-        token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        checkout: {
-          theme: 'light',
-          locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
-          closeOnSuccess: true,
-        },
-        profitwell: {
-          enabled: false
+        vendor: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+        eventCallback: function(data: any) {
+          console.log('Paddle event:', data);
         }
       });
       setIsPaddleLoaded(true);
@@ -60,22 +50,17 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     try {
-      const checkout = await window.Paddle.Checkout.create({
-        items: [
-          {
-            priceId: priceId,
-            quantity: 1,
-          },
-        ],
-        checkout: {
-          theme: 'light',
-          locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
-          closeOnSuccess: true,
+      window.Paddle.Checkout.open({
+        product: import.meta.env.VITE_PADDLE_PRODUCT_ID,
+        price: priceId,
+        successCallback: function(data: any) {
+          console.log('Checkout success:', data);
+          window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success`;
         },
+        closeCallback: function() {
+          console.log('Checkout closed');
+        }
       });
-      
-      await checkout.open();
     } catch (error) {
       console.error('Error opening checkout:', error);
       throw error;
