@@ -45,7 +45,13 @@ const PaymentPage = () => {
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
       if (clientToken) {
         window.Paddle.Environment.set("live");
-        window.Paddle.Setup({ token: clientToken });
+        window.Paddle.Setup({
+          token: clientToken,
+          environment: "live",
+          eventCallback: (data) => {
+            console.log("Paddle event:", data);
+          },
+        });
         setCheckoutJsLoaded(true);
       } else {
         console.error("Missing Paddle client token");
@@ -104,8 +110,9 @@ const PaymentPage = () => {
 
       // Get client token from environment variables
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+      const productId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
 
-      if (!clientToken) {
+      if (!clientToken || !productId) {
         setError(
           "Payment system configuration is missing. Please try again later."
         );
@@ -114,7 +121,15 @@ const PaymentPage = () => {
 
       // Initialize Paddle checkout
       window.Paddle.Checkout.open({
-        token: clientToken,
+        items: [
+          {
+            priceId: productId,
+            quantity: 1,
+          },
+        ],
+        customData: {
+          userId: userId,
+        },
         success: (data) => {
           console.log("Checkout successful:", data);
           navigate("/payment-success");
