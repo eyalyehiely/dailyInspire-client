@@ -115,14 +115,24 @@ const PaymentPage = () => {
       // If no direct URL, construct one using environment variables
       const appUrl = import.meta.env.VITE_APP_URL;
       const paddleCheckoutUrl = import.meta.env.VITE_PADDLE_CHECKOUT_URL;
+
+      // Ensure we have a product ID
+      if (!productId) {
+        console.error("No product ID available");
+        setError("Unable to generate checkout URL. Please try again later.");
+        return;
+      }
+
+      // Construct the URL with the correct Paddle format
       const params = new URLSearchParams({
-        product_id: productId,
-        user_id: currentUserId,
+        "items[0][price_id]": productId,
+        "items[0][quantity]": "1",
+        customer_id: currentUserId,
         success_url: `${appUrl}/payment-success`,
         cancel_url: `${appUrl}/payment`,
       });
 
-      const checkoutUrl = `${paddleCheckoutUrl}/${productId}?${params.toString()}`;
+      const checkoutUrl = `${paddleCheckoutUrl}/custom-checkout?${params.toString()}`;
       console.log("Generated checkout URL:", checkoutUrl);
       window.location.href = checkoutUrl;
     } catch (error) {
