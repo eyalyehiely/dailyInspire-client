@@ -19,7 +19,8 @@ const PaymentPage = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const [userId, setUserId] = useState("");
   const [productId, setProductId] = useState("");
-  const [directCheckoutUrl, setDirectCheckoutUrl] = useState("");
+  const [clientToken, setClientToken] = useState("");
+  const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
@@ -35,6 +36,20 @@ const PaymentPage = () => {
       return;
     }
 
+    // Load Paddle checkout.js
+    const script = document.createElement("script");
+    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Paddle checkout.js loaded");
+      setCheckoutJsLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Paddle checkout.js");
+      setError("Failed to load payment system. Please try again later.");
+    };
+    document.body.appendChild(script);
+
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
@@ -43,11 +58,6 @@ const PaymentPage = () => {
         });
 
         console.log("Checkout info response:", response.data);
-        console.log("Product ID from response:", response.data.productId);
-        console.log(
-          "Full response data:",
-          JSON.stringify(response.data, null, 2)
-        );
 
         if (response.data.isPaid) {
           console.log("User already has premium access");
@@ -57,8 +67,7 @@ const PaymentPage = () => {
 
         setUserId(response.data.userId);
         setProductId(response.data.productId);
-        console.log("Setting product ID in state:", response.data.productId);
-        setDirectCheckoutUrl(response.data.directCheckoutUrl);
+        setClientToken(response.data.clientToken);
         setSubscriptionStatus(response.data.subscriptionStatus);
         setLoading(false);
       } catch (error) {
@@ -69,82 +78,36 @@ const PaymentPage = () => {
     };
 
     fetchCheckoutInfo();
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, [userData, navigate, location.state]);
 
   const handleProceedToPayment = () => {
     try {
-      // Get the current user ID with clear logging for each check
-      let currentUserId = null;
-
-      // Try to get from state first
-      if (userId) {
-        console.log("Using user ID from state:", userId);
-        currentUserId = userId;
-      }
-      // Then from userData (if coming from registration)
-      else if (userData?.id) {
-        console.log("Using user ID from registration flow:", userData.id);
-        currentUserId = userData.id;
-      }
-      // Then from localStorage as fallback
-      else if (localStorage.getItem("userId")) {
-        console.log(
-          "Using user ID from localStorage:",
-          localStorage.getItem("userId")
-        );
-        currentUserId = localStorage.getItem("userId");
-      }
-      // Last resort fallback
-      else {
-        console.warn("No user ID found, cannot proceed with payment");
-        setError(
-          "Unable to identify your account. Please try logging in again."
-        );
+      if (!window.Paddle || !clientToken) {
+        setError("Payment system not ready. Please try again.");
         return;
       }
 
-      console.log("Final user ID for checkout:", currentUserId);
-
-      // Store in local storage for potential webhook fallback
-      localStorage.setItem("userId", currentUserId);
-
-      // Use directCheckoutUrl if available from server
-      if (directCheckoutUrl) {
-        console.log(
-          "Using server-provided direct checkout URL:",
-          directCheckoutUrl
-        );
-        window.location.href = directCheckoutUrl;
-        return;
-      }
-
-      // If no direct URL, construct one using environment variables
-      const appUrl = import.meta.env.VITE_APP_URL;
-      const paddleCheckoutUrl = import.meta.env.VITE_PADDLE_CHECKOUT_URL;
-      const envProductId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
-
-      // Use product ID from server response or fallback to environment variable
-      const finalProductId = productId || envProductId;
-
-      // Ensure we have a product ID
-      if (!finalProductId) {
-        console.error("No product ID available");
-        setError("Unable to generate checkout URL. Please try again later.");
-        return;
-      }
-
-      // Construct the URL with the correct Paddle format
-      const params = new URLSearchParams({
-        "items[0][price_id]": finalProductId,
-        "items[0][quantity]": "1",
-        customer_id: currentUserId,
-        success_url: `${appUrl}/payment-success`,
-        cancel_url: `${appUrl}/payment`,
+      // Initialize Paddle checkout
+      window.Paddle.Checkout.open({
+        token: clientToken,
+        success: (data) => {
+          console.log("Checkout successful:", data);
+          navigate("/payment-success");
+        },
+        close: () => {
+          console.log("Checkout closed");
+        },
+        error: (error) => {
+          console.error("Checkout error:", error);
+          setError("Payment failed. Please try again.");
+        },
       });
-
-      const checkoutUrl = `${paddleCheckoutUrl}/custom-checkout?${params.toString()}`;
-      console.log("Generated checkout URL:", checkoutUrl);
-      window.location.href = checkoutUrl;
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");
