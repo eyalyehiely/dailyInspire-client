@@ -259,7 +259,7 @@ const PaymentPage = () => {
   // };
   const handlePaddle = () => {
     if(window.Paddle){
-      paddle.Checkout.open({
+      Paddle.Checkout.open({
         items: 
         [
           { 
@@ -276,11 +276,11 @@ const PaymentPage = () => {
 
   useEffect(()=>{
     if(window.Paddle){
-      paddle.Environment.set("sandbox");
-      paddle.Initialize({
+      Paddle.Environment.set("sandbox");
+      Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
       });
-      paddle.Checkout.open({
+      Paddle.Checkout.open({
         items: [{ priceId: import.meta.env.VITE_PADDLE_PRICE_ID, quantity: 1 }],
         customData: {
           userId: userId,
