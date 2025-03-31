@@ -28,71 +28,64 @@ const PaymentPage = () => {
     // Set isNewUser based on whether we came directly from registration
     setIsNewUser(!!userData && location.state?.from === "register");
 
-    // If no auth token, redirect to register
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      navigate("/register");
-      return;
-    }
+    // Add a small delay to ensure token is stored
+    const initializePayment = async () => {
+      // If no auth token, redirect to register
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        navigate("/register");
+        return;
+      }
 
-    // Load Paddle checkout.js
-    const script = document.createElement("script");
-    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
-    script.async = true;
-    script.onload = () => {
-      console.log("Paddle checkout.js loaded");
-      // Initialize Paddle with the client token
-      const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
-      if (clientToken) {
-        try {
-          window.Paddle.Environment.set("live");
-          window.Paddle.Setup({
-            token: clientToken,
-            checkout: {
-              frontendBase: import.meta.env.VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
-              backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
-              theme: "light",
-              locale: "en",
-              successUrl: `${window.location.origin}/payment-success`,
-              closeOnSuccess: true,
-            },
-            eventCallback: (data) => {
-              console.log("Paddle event:", data);
-            },
-            profitwell: {
-              enabled: false,
-            },
-          });
-          setCheckoutJsLoaded(true);
-        } catch (error) {
-          console.error("Error initializing Paddle:", error);
+      // Load Paddle checkout.js
+      const script = document.createElement("script");
+      script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+      script.async = true;
+      script.onload = () => {
+        console.log("Paddle checkout.js loaded");
+        // Initialize Paddle with the client token
+        const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+        if (clientToken) {
+          try {
+            window.Paddle.Environment.set("live");
+            window.Paddle.Setup({
+              token: clientToken,
+              checkout: {
+                frontendBase: import.meta.env
+                  .VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
+                backendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
+                theme: "light",
+                locale: "en",
+                successUrl: `${window.location.origin}/payment-success`,
+                closeOnSuccess: true,
+              },
+              eventCallback: (data) => {
+                console.log("Paddle event:", data);
+              },
+              profitwell: {
+                enabled: false,
+              },
+            });
+            setCheckoutJsLoaded(true);
+          } catch (error) {
+            console.error("Error initializing Paddle:", error);
+            setError("Failed to initialize payment system. Please try again.");
+          }
+        } else {
+          console.error("Missing Paddle client token");
           setError(
-            "Failed to initialize payment system. Please try again later."
+            "Payment system configuration is missing. Please try again later."
           );
         }
-      } else {
-        console.error("Missing Paddle client token");
-        setError(
-          "Payment system configuration is missing. Please try again later."
-        );
-      }
-    };
-    script.onerror = () => {
-      console.error("Failed to load Paddle checkout.js");
-      setError("Failed to load payment system. Please try again later.");
-    };
-    document.body.appendChild(script);
+      };
+      script.onerror = () => {
+        console.error("Failed to load Paddle checkout.js");
+        setError("Failed to load payment system. Please try again later.");
+      };
+      document.body.appendChild(script);
 
-    // Fetch checkout info
-    const fetchCheckoutInfo = async () => {
+      // Fetch checkout info
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.error("No auth token found");
-          navigate("/register");
-          return;
-        }
-
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
@@ -129,10 +122,13 @@ const PaymentPage = () => {
       }
     };
 
-    fetchCheckoutInfo();
+    // Add a small delay before initializing
+    const timer = setTimeout(initializePayment, 500);
 
     return () => {
-      if (document.body.contains(script)) {
+      clearTimeout(timer);
+      const script = document.querySelector('script[src*="paddle.js"]');
+      if (script) {
         document.body.removeChild(script);
       }
     };

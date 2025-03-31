@@ -49,6 +49,8 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         localStorage.setItem('user', JSON.stringify(data.user));
         if (data.token) {
             localStorage.setItem('authToken', data.token);
+            // Add a small delay to ensure token is stored
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
         
         // Return user data so we can pass it to the payment page
