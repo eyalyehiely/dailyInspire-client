@@ -19,7 +19,6 @@ const PaymentPage = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const [userId, setUserId] = useState("");
   const [productId, setProductId] = useState("");
-  const [clientToken, setClientToken] = useState("");
   const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
 
   // Get user data from location state (passed from registration)
@@ -42,7 +41,18 @@ const PaymentPage = () => {
     script.async = true;
     script.onload = () => {
       console.log("Paddle checkout.js loaded");
-      setCheckoutJsLoaded(true);
+      // Initialize Paddle with the client token
+      const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+      if (clientToken) {
+        window.Paddle.Environment.set("live");
+        window.Paddle.Setup({ token: clientToken });
+        setCheckoutJsLoaded(true);
+      } else {
+        console.error("Missing Paddle client token");
+        setError(
+          "Payment system configuration is missing. Please try again later."
+        );
+      }
     };
     script.onerror = () => {
       console.error("Failed to load Paddle checkout.js");
@@ -67,7 +77,6 @@ const PaymentPage = () => {
 
         setUserId(response.data.userId);
         setProductId(response.data.productId);
-        setClientToken(response.data.clientToken);
         setSubscriptionStatus(response.data.subscriptionStatus);
         setLoading(false);
       } catch (error) {
@@ -88,8 +97,18 @@ const PaymentPage = () => {
 
   const handleProceedToPayment = () => {
     try {
-      if (!window.Paddle || !clientToken) {
+      if (!window.Paddle) {
         setError("Payment system not ready. Please try again.");
+        return;
+      }
+
+      // Get client token from environment variables
+      const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+
+      if (!clientToken) {
+        setError(
+          "Payment system configuration is missing. Please try again later."
+        );
         return;
       }
 
