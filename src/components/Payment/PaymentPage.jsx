@@ -44,6 +44,10 @@ const PaymentPage = () => {
 
         console.log("Checkout info response:", response.data);
         console.log("Product ID from response:", response.data.productId);
+        console.log(
+          "Full response data:",
+          JSON.stringify(response.data, null, 2)
+        );
 
         if (response.data.isPaid) {
           console.log("User already has premium access");
