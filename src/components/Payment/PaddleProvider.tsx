@@ -25,16 +25,19 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isPaddleLoaded, setIsPaddleLoaded] = useState(false);
 
   useEffect(() => {
+    console.log('PaddleProvider: Initializing Paddle...');
     const script = document.createElement('script');
     script.src = 'https://cdn.paddle.com/paddle.js';
     script.async = true;
     script.onload = () => {
+      console.log('PaddleProvider: Script loaded, setting up Paddle...');
       window.Paddle.Setup({
         vendor: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
         eventCallback: function(data: any) {
-          console.log('Paddle event:', data);
+          console.log('PaddleProvider: Paddle event:', data);
         }
       });
+      console.log('PaddleProvider: Setup complete, setting isPaddleLoaded to true');
       setIsPaddleLoaded(true);
     };
     document.body.appendChild(script);
@@ -45,24 +48,29 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const openCheckout = async (priceId: string) => {
+    console.log('PaddleProvider: openCheckout called with priceId:', priceId);
+    console.log('PaddleProvider: isPaddleLoaded:', isPaddleLoaded);
+    
     if (!isPaddleLoaded) {
+      console.error('PaddleProvider: Paddle is not loaded yet');
       throw new Error('Paddle is not loaded yet');
     }
 
     try {
+      console.log('PaddleProvider: Opening checkout...');
       window.Paddle.Checkout.open({
         product: import.meta.env.VITE_PADDLE_PRODUCT_ID,
         price: priceId,
         successCallback: function(data: any) {
-          console.log('Checkout success:', data);
+          console.log('PaddleProvider: Checkout success:', data);
           window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success`;
         },
         closeCallback: function() {
-          console.log('Checkout closed');
+          console.log('PaddleProvider: Checkout closed');
         }
       });
     } catch (error) {
-      console.error('Error opening checkout:', error);
+      console.error('PaddleProvider: Error opening checkout:', error);
       throw error;
     }
   };

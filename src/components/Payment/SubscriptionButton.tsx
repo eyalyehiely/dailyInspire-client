@@ -15,10 +15,14 @@ export const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({
   const { openCheckout, isPaddleLoaded } = usePaddle();
 
   const handleClick = async () => {
+    console.log('SubscriptionButton: Button clicked');
+    console.log('SubscriptionButton: isPaddleLoaded:', isPaddleLoaded);
+    console.log('SubscriptionButton: priceId:', priceId);
+    
     try {
       await openCheckout(priceId);
     } catch (error) {
-      console.error('Failed to open checkout:', error);
+      console.error('SubscriptionButton: Failed to open checkout:', error);
       // You might want to show an error message to the user here
     }
   };
