@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { PaddleProvider } from "./components/payment/PaddleProvider";
+import { PaddleProvider } from "./components/Payment/PaddleProvider";
 
 // General:
 import PageTitle from "./components/General/PageTitle.js";
