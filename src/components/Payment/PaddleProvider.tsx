@@ -30,16 +30,14 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     script.async = true;
     script.onload = () => {
       window.Paddle.Environment.set('sandbox');
-      window.Paddle.Checkout.config({
+      window.Paddle.Setup({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        product: import.meta.env.VITE_PADDLE_PRODUCT_ID,
-        settings: {
+        environment: 'sandbox',
+        checkout: {
           theme: 'light',
           locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/success`,
-          closeCallback: () => {
-            console.log('Checkout closed');
-          },
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
+          closeOnSuccess: true,
         },
       });
       setIsPaddleLoaded(true);
