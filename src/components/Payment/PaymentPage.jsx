@@ -15,7 +15,6 @@ const PaymentPage = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [checkoutUrl, setCheckoutUrl] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("none");
   const [isNewUser, setIsNewUser] = useState(false);
   const [userId, setUserId] = useState("");
@@ -113,8 +112,19 @@ const PaymentPage = () => {
         return;
       }
 
-      // If no direct URL, show error
-      setError("Unable to generate checkout URL. Please try again later.");
+      // If no direct URL, construct one using environment variables
+      const appUrl = import.meta.env.VITE_APP_URL;
+      const paddleCheckoutUrl = import.meta.env.VITE_PADDLE_CHECKOUT_URL;
+      const params = new URLSearchParams({
+        product_id: productId,
+        user_id: currentUserId,
+        success_url: `${appUrl}/payment-success`,
+        cancel_url: `${appUrl}/payment`,
+      });
+
+      const checkoutUrl = `${paddleCheckoutUrl}/${productId}?${params.toString()}`;
+      console.log("Generated checkout URL:", checkoutUrl);
+      window.location.href = checkoutUrl;
     } catch (error) {
       console.error("Error processing payment:", error);
       setError("Unable to process payment. Please try again later.");
