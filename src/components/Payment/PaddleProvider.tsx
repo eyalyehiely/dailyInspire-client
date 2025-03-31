@@ -41,6 +41,9 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
           closeOnSuccess: true,
         },
+        profitwell: {
+          enabled: false
+        }
       });
       setIsPaddleLoaded(true);
     };
