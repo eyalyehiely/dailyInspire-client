@@ -96,7 +96,7 @@ const PaymentPage = () => {
             // Set environment first
             window.Paddle.Environment.set("live");
 
-            // Then setup with minimal configuration and disable Profitwell
+            // Then setup with minimal configuration
             window.Paddle.Setup({
               token: clientToken,
               checkout: {
@@ -104,10 +104,6 @@ const PaymentPage = () => {
                 locale: "en",
                 successUrl: `${window.location.origin}/payment-success`,
                 closeOnSuccess: true,
-              },
-              settings: {
-                disableAnalytics: true,
-                disableProfitwell: true,
               },
             });
 
