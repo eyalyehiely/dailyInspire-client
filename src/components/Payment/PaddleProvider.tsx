@@ -30,7 +30,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     script.async = true;
     script.onload = () => {
       // Set environment first
-      window.Paddle.Environment.set('sandbox');
+      window.Paddle.Environment.set('live');
       
       // Then setup with minimal configuration
       window.Paddle.Setup({
@@ -57,7 +57,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     try {
-      await window.Paddle.Checkout.open({
+      const checkout = await window.Paddle.Checkout.create({
         items: [
           {
             priceId: priceId,
@@ -71,6 +71,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           closeOnSuccess: true,
         },
       });
+      
+      await checkout.open();
     } catch (error) {
       console.error('Error opening checkout:', error);
       throw error;
