@@ -19,7 +19,6 @@ const PaymentPage = () => {
   const [isNewUser, setIsNewUser] = useState(false);
   const [userId, setUserId] = useState("");
   const [productId, setProductId] = useState("");
-  const [checkoutJsLoaded, setCheckoutJsLoaded] = useState(false);
 
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
@@ -27,6 +26,16 @@ const PaymentPage = () => {
   useEffect(() => {
     // Set isNewUser based on whether we came directly from registration
     setIsNewUser(!!userData && location.state?.from === "register");
+
+    // Create a promise for script loading
+    const scriptLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
 
     // Add a small delay to ensure token is stored
     const initializePayment = async () => {
@@ -87,7 +96,6 @@ const PaymentPage = () => {
             }
 
             console.log("Paddle initialized successfully");
-            setCheckoutJsLoaded(true);
           } catch (error) {
             console.error("Error initializing Paddle:", error);
             setError(
@@ -153,116 +161,59 @@ const PaymentPage = () => {
     };
   }, [userData, navigate, location.state]);
 
-  // const handleProceedToPayment = () => {
-    // try {
-      // Check if Paddle is loaded and initialized
-      // if (typeof window.Paddle === "undefined") {
-      //   console.error("Paddle is not loaded");
-      //   setError("Payment system not ready. Please try again.");
-      //   return;
-      // }
+  // Get client token from environment variables
+  const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
+  const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
 
-      // if (!checkoutJsLoaded) {
-      //   console.error("Checkout JS not loaded yet");
-      //   setError(
-      //     "Payment system is still initializing. Please wait and try again."
-      //   );
-      //   return;
-      // }
-
-      // if (!userId) {
-      //   console.error("Missing userId");
-      //   setError("User information is missing. Please try again.");
-      //   return;
-      // }
-
-      // Get client token from environment variables
-      const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
-      const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
-
-      // console.log("Starting payment process with:", {
-      //   userId,
-      //   priceId: priceId ? "present" : "missing",
-      //   clientToken: clientToken ? "present" : "missing",
-      // });
-
-      // if (!clientToken || !priceId) {
-      //   console.error("Missing configuration:", {
-      //     clientToken: !!clientToken,
-      //     priceId: !!priceId,
-      //   });
-      //   setError(
-      //     "Payment system configuration is missing. Please try again later."
-      //   );
-      //   return;
-      // }
-
-      // Initialize Paddle checkout with minimal configuration
-  //     window.Paddle.Checkout.open({
-  //       items: [
-  //         {
-  //           priceId: priceId,
-  //           quantity: 1,
-  //         },
-  //       ],
-  //       customData: {
-  //         userId: userId,
-  //       },
-  //       theme: "light",
-  //       locale: "en",
-  //       successUrl: `${window.location.origin}/payment-success`,
-  //       closeOnSuccess: true,
-  //       success: (data) => {
-  //         console.log("Checkout successful:", data);
-  //         navigate("/payment-success");
-  //       },
-  //       close: () => {
-  //         console.log("Checkout closed");
-  //       },
-  //       error: (error) => {
-  //         console.error("Checkout error details:", error);
-  //         setError(`Payment failed: ${error.message || "Unknown error"}`);
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("Detailed payment error:", error);
-  //     setError(
-  //       `Unable to process payment: ${error.message || "Unknown error"}`
-  //     );
-  //   }
-  // };
   const handlePaddle = () => {
-    if(window.Paddle){
+    if (window.Paddle) {
       Paddle.Checkout.open({
-        items: 
-        [
-          { 
+        items: [
+          {
             priceId: import.meta.env.VITE_PADDLE_PRICE_ID,
-             quantity: 1 
-          }
+            quantity: 1,
+          },
         ],
         customData: {
           userId: userId,
         },
       });
     }
-  }
+  };
 
-  useEffect(()=>{
-    if(window.Paddle){
-      Paddle.Environment.set("sandbox");
-      Paddle.Initialize({
+  useEffect(() => {
+    if (window.Paddle) {
+      // Set environment first
+      window.Paddle.Environment.set("sandbox");
+
+      // Initialize with the client token
+      window.Paddle.Setup({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-      });
-      Paddle.Checkout.open({
-        items: [{ priceId: import.meta.env.VITE_PADDLE_PRICE_ID, quantity: 1 }],
-        customData: {
-          userId: userId,
+        environment: "sandbox",
+        checkout: {
+          theme: "light",
+          locale: "en",
+          successUrl: `${window.location.origin}/payment-success`,
+          closeOnSuccess: true,
         },
       });
 
+      // Only open checkout if we have a userId
+      if (userId) {
+        window.Paddle.Checkout.open({
+          items: [
+            {
+              priceId: import.meta.env.VITE_PADDLE_PRICE_ID,
+              quantity: 1,
+            },
+          ],
+          customData: {
+            userId: userId,
+          },
+        });
+      }
     }
-  },[])
+  }, [userId]);
 
   if (loading) {
     return (
