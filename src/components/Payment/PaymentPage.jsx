@@ -276,7 +276,7 @@ const PaymentPage = () => {
 
   useEffect(()=>{
     if(window.Paddle){
-      Paddle.Environment.set("sandbox");
+      Paddle.Environment.set("live");
       Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
       });
