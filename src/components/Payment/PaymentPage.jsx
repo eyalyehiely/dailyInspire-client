@@ -46,27 +46,43 @@ const PaymentPage = () => {
         console.log("Paddle checkout.js loaded");
         // Initialize Paddle with the client token
         const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
-        if (clientToken) {
-          try {
-            window.Paddle.Environment.set("live");
-            window.Paddle.Setup({
-              token: clientToken,
-              checkout: {
-                theme: "light",
-                locale: "en",
-                successUrl: `${window.location.origin}/payment-success`,
-                closeOnSuccess: true,
-              },
-            });
-            setCheckoutJsLoaded(true);
-          } catch (error) {
-            console.error("Error initializing Paddle:", error);
-            setError("Failed to initialize payment system. Please try again.");
-          }
-        } else {
-          console.error("Missing Paddle client token");
+        const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
+
+        console.log("Initializing Paddle with:", {
+          clientToken: clientToken ? "present" : "missing",
+          priceId: priceId ? "present" : "missing",
+        });
+
+        if (!clientToken || !priceId) {
+          console.error("Missing required configuration:", {
+            clientToken: !!clientToken,
+            priceId: !!priceId,
+          });
           setError(
             "Payment system configuration is missing. Please try again later."
+          );
+          return;
+        }
+
+        try {
+          window.Paddle.Environment.set("live");
+          window.Paddle.Setup({
+            token: clientToken,
+            checkout: {
+              theme: "light",
+              locale: "en",
+              successUrl: `${window.location.origin}/payment-success`,
+              closeOnSuccess: true,
+            },
+          });
+          console.log("Paddle initialized successfully");
+          setCheckoutJsLoaded(true);
+        } catch (error) {
+          console.error("Error initializing Paddle:", error);
+          setError(
+            `Failed to initialize payment system: ${
+              error.message || "Unknown error"
+            }`
           );
         }
       };
@@ -130,7 +146,22 @@ const PaymentPage = () => {
   const handleProceedToPayment = () => {
     try {
       if (!window.Paddle) {
+        console.error("Paddle is not initialized");
         setError("Payment system not ready. Please try again.");
+        return;
+      }
+
+      if (!checkoutJsLoaded) {
+        console.error("Checkout JS not loaded yet");
+        setError(
+          "Payment system is still initializing. Please wait and try again."
+        );
+        return;
+      }
+
+      if (!userId) {
+        console.error("Missing userId");
+        setError("User information is missing. Please try again.");
         return;
       }
 
@@ -138,7 +169,17 @@ const PaymentPage = () => {
       const clientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN;
       const priceId = import.meta.env.VITE_PADDLE_PRICE_ID;
 
+      console.log("Starting payment process with:", {
+        userId,
+        priceId: priceId ? "present" : "missing",
+        clientToken: clientToken ? "present" : "missing",
+      });
+
       if (!clientToken || !priceId) {
+        console.error("Missing configuration:", {
+          clientToken: !!clientToken,
+          priceId: !!priceId,
+        });
         setError(
           "Payment system configuration is missing. Please try again later."
         );
@@ -149,7 +190,7 @@ const PaymentPage = () => {
       window.Paddle.Checkout.open({
         items: [
           {
-            priceId: import.meta.env.VITE_PADDLE_PRICE_ID,
+            priceId: priceId,
             quantity: 1,
           },
         ],
@@ -168,13 +209,15 @@ const PaymentPage = () => {
           console.log("Checkout closed");
         },
         error: (error) => {
-          console.error("Checkout error:", error);
-          setError("Payment failed. Please try again.");
+          console.error("Checkout error details:", error);
+          setError(`Payment failed: ${error.message || "Unknown error"}`);
         },
       });
     } catch (error) {
-      console.error("Error processing payment:", error);
-      setError("Unable to process payment. Please try again later.");
+      console.error("Detailed payment error:", error);
+      setError(
+        `Unable to process payment: ${error.message || "Unknown error"}`
+      );
     }
   };
 
