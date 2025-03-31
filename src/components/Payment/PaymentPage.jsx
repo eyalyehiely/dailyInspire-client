@@ -93,10 +93,12 @@ const PaymentPage = () => {
               throw new Error("Paddle is not loaded yet");
             }
 
-            // Initialize Paddle with minimal configuration
+            // Set environment first
+            window.Paddle.Environment.set("live");
+
+            // Then setup with minimal configuration
             window.Paddle.Setup({
               token: clientToken,
-              environment: "live",
               checkout: {
                 theme: "light",
                 locale: "en",
