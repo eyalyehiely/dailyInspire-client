@@ -18,6 +18,7 @@ const PaymentPage = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState("none");
   const [isNewUser, setIsNewUser] = useState(false);
   const [userId, setUserId] = useState("");
+  const [productId, setProductId] = useState("");
   const [directCheckoutUrl, setDirectCheckoutUrl] = useState("");
 
   // Get user data from location state (passed from registration)
@@ -50,7 +51,7 @@ const PaymentPage = () => {
         }
 
         setUserId(response.data.userId);
-        const productId = import.meta.env.VITE_PADDLE_PRODUCT_ID;
+        setProductId(response.data.productId);
         setDirectCheckoutUrl(response.data.directCheckoutUrl);
         setSubscriptionStatus(response.data.subscriptionStatus);
         setLoading(false);
