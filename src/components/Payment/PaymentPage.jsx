@@ -47,6 +47,10 @@ const PaymentPage = () => {
         window.Paddle.Environment.set("live");
         window.Paddle.Setup({
           token: clientToken,
+          environment: "live",
+          checkoutFrontEndBase: import.meta.env
+            .VITE_PADDLE_CHECKOUT_FRONTEND_BASE,
+          checkoutBackendBase: import.meta.env.VITE_PADDLE_CHECKOUT_URL,
           eventCallback: (data) => {
             console.log("Paddle event:", data);
           },
