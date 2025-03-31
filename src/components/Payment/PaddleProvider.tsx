@@ -68,7 +68,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       window.Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        environment: 'production',
         eventCallback: function(data: any) {
           console.log('PaddleProvider: Paddle event:', data);
         }
