@@ -38,32 +38,6 @@ const PaymentPage = () => {
         return;
       }
 
-      // Load Paddle checkout.js
-      const script = document.createElement("script");
-      script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
-      script.async = true;
-
-      // Create a promise to handle script loading
-      const scriptLoadPromise = new Promise((resolve, reject) => {
-        script.onload = () => {
-          console.log("Paddle checkout.js loaded");
-          resolve();
-        };
-        script.onerror = (error) => {
-          console.error("Failed to load Paddle checkout.js:", error);
-          reject(error);
-        };
-      });
-
-      // Remove any existing Paddle script
-      const existingScript = document.querySelector('script[src*="paddle.js"]');
-      if (existingScript) {
-        document.body.removeChild(existingScript);
-      }
-
-      // Add the script to the document
-      document.body.appendChild(script);
-
       // Wait for script to load before initializing
       scriptLoadPromise
         .then(() => {
