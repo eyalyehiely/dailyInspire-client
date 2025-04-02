@@ -51,7 +51,8 @@ const PaymentSuccess = () => {
             response.data
           );
 
-          if (response.data.success && response.data.isPay) {
+          // Check if the response indicates a successful payment
+          if (response.data.success) {
             console.log("PaymentSuccess: Payment verified successfully");
             console.log(
               "PaymentSuccess: Subscription status:",
@@ -123,6 +124,7 @@ const PaymentSuccess = () => {
           statusResponse.data
         );
 
+        // Check if the status response indicates a successful payment
         if (statusResponse.data.isPay) {
           console.log(
             "PaymentSuccess: Payment status verified through status endpoint"
