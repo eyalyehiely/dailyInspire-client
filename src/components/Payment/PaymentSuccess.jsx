@@ -59,6 +59,16 @@ const PaymentSuccess = () => {
             );
             setSubscriptionStatus(response.data.subscriptionStatus);
             setLoading(false);
+
+            // Update user data in localStorage
+            const userDataString = localStorage.getItem("user");
+            if (userDataString) {
+              const userData = JSON.parse(userDataString);
+              userData.isPay = true;
+              userData.subscriptionStatus = response.data.subscriptionStatus;
+              localStorage.setItem("user", JSON.stringify(userData));
+            }
+
             // Redirect to preferences after a short delay
             console.log(
               "PaymentSuccess: Scheduling redirect to preferences..."
@@ -123,6 +133,17 @@ const PaymentSuccess = () => {
           );
           setSubscriptionStatus(statusResponse.data.subscriptionStatus);
           setLoading(false);
+
+          // Update user data in localStorage
+          const userDataString = localStorage.getItem("user");
+          if (userDataString) {
+            const userData = JSON.parse(userDataString);
+            userData.isPay = true;
+            userData.subscriptionStatus =
+              statusResponse.data.subscriptionStatus;
+            localStorage.setItem("user", JSON.stringify(userData));
+          }
+
           // Redirect to preferences after a short delay
           console.log("PaymentSuccess: Scheduling redirect to preferences...");
           setTimeout(() => {
