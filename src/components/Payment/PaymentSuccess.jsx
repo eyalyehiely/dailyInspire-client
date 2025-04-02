@@ -31,11 +31,8 @@ const PaymentSuccess = () => {
 
         console.log("PaymentSuccess: Starting payment verification process...");
 
-        // First try the verify-subscription endpoint
         try {
-          console.log(
-            "PaymentSuccess: Calling verify-subscription endpoint..."
-          );
+          console.log("PaymentSuccess: Checking payment status...");
           const response = await axios.get(
             `${import.meta.env.VITE_BASE_API}/payments/status`,
             {
@@ -46,13 +43,10 @@ const PaymentSuccess = () => {
             }
           );
 
-          console.log(
-            "PaymentSuccess: Verify-subscription response:",
-            response.data
-          );
+          console.log("PaymentSuccess: Status response:", response.data);
 
           // Check if the response indicates a successful payment
-          if (response.data.success) {
+          if (response.data.isPay) {
             console.log("PaymentSuccess: Payment verified successfully");
             console.log(
               "PaymentSuccess: Subscription status:",
@@ -80,83 +74,37 @@ const PaymentSuccess = () => {
             }, 2000);
             return;
           } else {
-            console.log(
-              "PaymentSuccess: Verify-subscription returned not paid"
-            );
+            console.log("PaymentSuccess: Payment not verified yet");
+
+            // If we haven't exceeded max retries, retry after a delay
+            if (retryCount < maxRetries) {
+              console.log(
+                `PaymentSuccess: Retrying verification (attempt ${
+                  retryCount + 1
+                }/${maxRetries})...`
+              );
+              setRetryCount((prev) => prev + 1);
+              setTimeout(fetchSubscriptionStatus, 2000); // Retry after 2 seconds
+              return;
+            }
           }
-        } catch (verifyError) {
+
+          // If we get here, all retries failed
           console.error(
-            "PaymentSuccess: Error in verify-subscription:",
-            verifyError
+            "PaymentSuccess: Payment verification failed after all retries"
+          );
+          setError("Payment verification failed. Please contact support.");
+          setLoading(false);
+        } catch (error) {
+          console.error(
+            "PaymentSuccess: Error in payment verification process:",
+            error
           );
           console.error(
             "PaymentSuccess: Error details:",
-            verifyError.response?.data || verifyError.message
+            error.response?.data || error.message
           );
-        }
-
-        // If verification failed and we haven't exceeded max retries, retry after a delay
-        if (retryCount < maxRetries) {
-          console.log(
-            `PaymentSuccess: Retrying verification (attempt ${
-              retryCount + 1
-            }/${maxRetries})...`
-          );
-          setRetryCount((prev) => prev + 1);
-          setTimeout(fetchSubscriptionStatus, 2000); // Retry after 2 seconds
-          return;
-        }
-
-        // If all retries failed, try the status endpoint as a last resort
-        console.log("PaymentSuccess: Trying status endpoint as fallback...");
-        const statusResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_API}/payments/status`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log(
-          "PaymentSuccess: Status endpoint response:",
-          statusResponse.data
-        );
-
-        // Check if the status response indicates a successful payment
-        if (statusResponse.data.isPay) {
-          console.log(
-            "PaymentSuccess: Payment status verified through status endpoint"
-          );
-          console.log(
-            "PaymentSuccess: Subscription status:",
-            statusResponse.data.subscriptionStatus
-          );
-          setSubscriptionStatus(statusResponse.data.subscriptionStatus);
-          setLoading(false);
-
-          // Update user data in localStorage
-          const userDataString = localStorage.getItem("user");
-          if (userDataString) {
-            const userData = JSON.parse(userDataString);
-            userData.isPay = true;
-            userData.subscriptionStatus =
-              statusResponse.data.subscriptionStatus;
-            localStorage.setItem("user", JSON.stringify(userData));
-          }
-
-          // Redirect to preferences after a short delay
-          console.log("PaymentSuccess: Scheduling redirect to preferences...");
-          setTimeout(() => {
-            console.log("PaymentSuccess: Redirecting to preferences...");
-            navigate("/preferences");
-          }, 2000);
-        } else {
-          console.error(
-            "PaymentSuccess: Payment verification failed in both endpoints"
-          );
-          setError("Payment verification failed. Please contact support.");
+          setError("Failed to verify payment status");
           setLoading(false);
         }
       } catch (error) {
