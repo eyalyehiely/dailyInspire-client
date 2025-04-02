@@ -47,13 +47,26 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         
         // Store user data and token in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Ensure token is properly formatted and stored
         if (data.token) {
-            // Ensure token is properly formatted
-            const token = data.token.startsWith('Bearer ') ? data.token : `Bearer ${data.token}`;
-            localStorage.setItem('authToken', token);
-            console.log("Token stored:", token);
+            // Remove any existing 'Bearer ' prefix if present
+            const cleanToken = data.token.replace('Bearer ', '');
+            // Add the 'Bearer ' prefix if not present
+            const formattedToken = cleanToken.startsWith('Bearer ') ? cleanToken : `Bearer ${cleanToken}`;
+            localStorage.setItem('authToken', formattedToken);
+            console.log("Token stored successfully:", formattedToken.substring(0, 10) + "...");
+            
+            // Verify token was stored correctly
+            const storedToken = localStorage.getItem('authToken');
+            if (!storedToken) {
+                throw new Error("Failed to store authentication token");
+            }
+            
             // Add a small delay to ensure token is stored
             await new Promise(resolve => setTimeout(resolve, 100));
+        } else {
+            throw new Error("No authentication token received from server");
         }
         
         // Return user data so we can pass it to the payment page
@@ -61,6 +74,9 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         
     } catch (error) {
         console.error("Signup error:", error);
+        // Clear any partially stored data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
         throw error; // Re-throw to be handled by the component
     } finally {
         if (setIsSubmitting) {

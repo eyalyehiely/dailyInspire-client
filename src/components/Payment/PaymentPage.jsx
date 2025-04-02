@@ -75,18 +75,33 @@ const PaymentPage = () => {
       return;
     }
 
+    // Verify token format
+    if (!token.startsWith("Bearer ")) {
+      console.log("Token format incorrect, fixing...");
+      localStorage.setItem(
+        "authToken",
+        `Bearer ${token.replace("Bearer ", "")}`
+      );
+    }
+
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
+        const currentToken = localStorage.getItem("authToken");
+        if (!currentToken) {
+          throw new Error("No authentication token available");
+        }
+
         console.log(
           "Fetching checkout info with token:",
-          token.substring(0, 10) + "..."
+          currentToken.substring(0, 10) + "..."
         );
+
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: currentToken,
               "Content-Type": "application/json",
             },
             withCredentials: true,
@@ -107,9 +122,22 @@ const PaymentPage = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching checkout info:", error);
+
+        // Handle different types of errors
         if (error.response?.status === 401) {
           console.log("Token is invalid or expired, redirecting to register");
+          // Clear invalid token
           localStorage.removeItem("authToken");
+          localStorage.removeItem("user");
+          // If we came from registration, show a message
+          if (isNewUser) {
+            setError(
+              "Registration completed but authentication failed. Please try registering again."
+            );
+          }
+          navigate("/register");
+        } else if (error.response?.status === 404) {
+          setError("User information not found. Please try registering again.");
           navigate("/register");
         } else {
           setError("Failed to load payment information. Please try again.");
@@ -119,7 +147,7 @@ const PaymentPage = () => {
     };
 
     fetchCheckoutInfo();
-  }, [userData, navigate, location.state]);
+  }, [userData, navigate, location.state, isNewUser]);
 
   if (loading) {
     return (
