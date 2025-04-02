@@ -78,7 +78,10 @@ const PaymentPage = () => {
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
-        console.log("Fetching checkout info with token:", token);
+        console.log(
+          "Fetching checkout info with token:",
+          token.substring(0, 10) + "..."
+        );
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
@@ -109,7 +112,7 @@ const PaymentPage = () => {
           localStorage.removeItem("authToken");
           navigate("/register");
         } else {
-          setError("Failed to load payment information");
+          setError("Failed to load payment information. Please try again.");
         }
         setLoading(false);
       }
