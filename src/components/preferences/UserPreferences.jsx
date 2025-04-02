@@ -298,14 +298,24 @@ const UserPreferences = () => {
   };
 
   // Function to handle subscription cancellation
-  const handleCancelSubscription = () => {
-    if (subscriptionData.cancelSubscriptionUrl) {
+  const handleCancelSubscription = async () => {
+    try {
+      if (!subscriptionData.cancelSubscriptionUrl) {
+        throw new Error("No cancellation URL available");
+      }
+
+      // Open the cancellation URL in a new tab
       window.open(subscriptionData.cancelSubscriptionUrl, "_blank");
-    } else if (subscriptionData.customerPortalUrl) {
-      window.open(subscriptionData.customerPortalUrl, "_blank");
-    } else {
+
+      // Show success message
+      setSuccessMessage(
+        "Subscription cancellation page opened. Please complete the cancellation process."
+      );
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
       setError(
-        "Unable to access subscription management. Please contact support."
+        "Failed to open cancellation page. Please try again or contact support."
       );
     }
   };
