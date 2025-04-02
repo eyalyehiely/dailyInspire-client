@@ -24,6 +24,45 @@ const PaymentPage = () => {
   // Get user data from location state (passed from registration)
   const userData = location.state?.userData;
 
+  // Add new function to verify payment status
+  const verifyPaymentStatus = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("No auth token found");
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("Payment status verification:", response.data);
+
+      if (
+        response.data.success &&
+        response.data.isPay &&
+        response.data.subscriptionStatus === "active"
+      ) {
+        console.log("Payment verified successfully");
+        navigate("/dashboard");
+      } else {
+        console.log("Payment not yet processed, waiting...");
+        // Retry after 5 seconds
+        setTimeout(verifyPaymentStatus, 5000);
+      }
+    } catch (error) {
+      console.error("Error verifying payment status:", error);
+      setError("Failed to verify payment status");
+    }
+  };
+
   useEffect(() => {
     // Set isNewUser based on whether we came directly from registration
     setIsNewUser(!!userData && location.state?.from === "register");
