@@ -163,18 +163,7 @@ const UserPreferences = () => {
     fetchPreferences();
     fetchSubscriptionData();
 
-    // Load LemonSqueezy checkout.js
-    const script = document.createElement("script");
-    script.src = "https://app.lemonsqueezy.com/js/checkout.js";
-    script.async = true;
-    script.onload = () => {
-      console.log("Lemon Squeezy checkout.js loaded");
-      setCheckoutJsLoaded(true);
-    };
-    script.onerror = () => {
-      console.error("Failed to load Lemon Squeezy checkout.js");
-    };
-    document.body.appendChild(script);
+
 
     return () => {
       if (document.body.contains(script)) {
