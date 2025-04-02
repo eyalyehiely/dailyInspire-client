@@ -105,7 +105,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       window.Paddle.Checkout.open({
         items: [{
           priceId: priceId,
-          quantity: 1
+          quantity: 1,
         }],
         settings: {
           theme: 'light',
@@ -120,6 +120,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           email: userData.email,
         } : undefined,
       });
+      console.log('PaddleProvider: Checkout opened with user data:', userData);
+      
     } catch (error) {
       console.error('PaddleProvider: Error opening checkout:', error);
       throw error;
