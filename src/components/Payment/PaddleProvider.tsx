@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 declare global {
   interface Window {
@@ -59,6 +60,47 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
+  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
+        {
+          subscriptionId,
+          subscriptionStatus
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        // Update local storage with new user data
+        const userDataString = localStorage.getItem('user');
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
+          const updatedUserData = {
+            ...userData,
+            ...response.data.user
+          };
+          localStorage.setItem('user', JSON.stringify(updatedUserData));
+        }
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user subscription:', error);
+      throw error;
+    }
+  };
+
   const setupPaddle = () => {
     try {
       console.log('PaddleProvider: Setting up Paddle...');
@@ -66,7 +108,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       window.Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        eventCallback: function(data: any) {
+        eventCallback: async function(data: any) {
           console.log('PaddleProvider: Paddle event received:', {
             event: data.event,
             data: data
@@ -76,7 +118,18 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           if (data.event === 'checkout.completed') {
             console.log('PaddleProvider: Checkout completed event received');
             console.log('PaddleProvider: Checkout data:', data);
-            // The success URL will handle the redirect
+            
+            try {
+              // Update user subscription data
+              await updateUserSubscription(
+                data.data.subscription_id,
+                'active'
+              );
+              
+              console.log('PaddleProvider: User subscription updated successfully');
+            } catch (error) {
+              console.error('PaddleProvider: Error updating user subscription:', error);
+            }
           }
         }
       });
