@@ -75,15 +75,6 @@ const PaymentPage = () => {
       return;
     }
 
-    // Verify token format
-    if (!token.startsWith("Bearer ")) {
-      console.log("Token format incorrect, fixing...");
-      localStorage.setItem(
-        "authToken",
-        `Bearer ${token.replace("Bearer ", "")}`
-      );
-    }
-
     // Fetch checkout info
     const fetchCheckoutInfo = async () => {
       try {
@@ -101,7 +92,7 @@ const PaymentPage = () => {
           `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
           {
             headers: {
-              Authorization: currentToken,
+              Authorization: `Bearer ${currentToken}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,

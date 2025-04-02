@@ -48,14 +48,12 @@ export const signup = async (formData, setIsSuccess, setIsSubmitting) => {
         // Store user data and token in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Ensure token is properly formatted and stored
+        // Store the token without any prefix - the backend will handle the prefix
         if (data.token) {
             // Remove any existing 'Bearer ' prefix if present
             const cleanToken = data.token.replace('Bearer ', '');
-            // Add the 'Bearer ' prefix if not present
-            const formattedToken = cleanToken.startsWith('Bearer ') ? cleanToken : `Bearer ${cleanToken}`;
-            localStorage.setItem('authToken', formattedToken);
-            console.log("Token stored successfully:", formattedToken.substring(0, 10) + "...");
+            localStorage.setItem('authToken', cleanToken);
+            console.log("Token stored successfully:", cleanToken.substring(0, 10) + "...");
             
             // Verify token was stored correctly
             const storedToken = localStorage.getItem('authToken');
