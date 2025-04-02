@@ -36,7 +36,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const script = document.createElement('script');
-    // Use the correct script URL from environment variables
     script.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
     script.async = true;
     
@@ -50,7 +49,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError('Failed to load payment system. Please check your internet connection and try again.');
     };
 
-    // Add script to head instead of body
     document.head.appendChild(script);
 
     return () => {
@@ -69,7 +67,17 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       window.Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
         eventCallback: function(data: any) {
-          console.log('PaddleProvider: Paddle event:', data);
+          console.log('PaddleProvider: Paddle event received:', {
+            event: data.event,
+            data: data
+          });
+          
+          // Handle successful payment event
+          if (data.event === 'checkout.completed') {
+            console.log('PaddleProvider: Checkout completed event received');
+            console.log('PaddleProvider: Checkout data:', data);
+            // The success URL will handle the redirect
+          }
         }
       });
       console.log('PaddleProvider: Setup complete');
@@ -100,7 +108,12 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const userData = userDataString ? JSON.parse(userDataString) : null;
       
       console.log('PaddleProvider: Opening checkout...');
+      console.log('PaddleProvider: User data:', userData);
       console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
+      
+      // Create a unique success URL with timestamp to prevent caching
+      const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+      console.log('PaddleProvider: Success URL:', successUrl);
       
       window.Paddle.Checkout.open({
         items: [{
@@ -111,7 +124,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           theme: 'light',
           displayMode: 'overlay',
           locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
+          successUrl: successUrl,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
           }
@@ -120,7 +133,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           email: userData.email,
         } : undefined,
       });
-      console.log('PaddleProvider: Checkout opened with user data:', userData);
+      console.log('PaddleProvider: Checkout opened successfully');
       
     } catch (error) {
       console.error('PaddleProvider: Error opening checkout:', error);

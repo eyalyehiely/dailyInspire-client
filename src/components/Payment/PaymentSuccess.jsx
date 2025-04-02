@@ -1,31 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { CheckCircle, Home, AlertCircle } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { CheckCircle, Home, AlertCircle, RefreshCw } from "lucide-react";
 import Header from "../General/Header";
 import axios from "axios";
 
 const PaymentSuccess = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("active");
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 5;
 
   useEffect(() => {
+    console.log("PaymentSuccess: Component mounted");
+    console.log("PaymentSuccess: URL parameters:", location.search);
+
     const fetchSubscriptionStatus = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        console.log("PaymentSuccess: Auth token present:", !!token);
 
         if (!token) {
-          console.error("No auth token found");
+          console.error("PaymentSuccess: No auth token found");
           setError("Authentication required");
           setLoading(false);
           return;
         }
 
-        console.log("Starting payment verification process...");
+        console.log("PaymentSuccess: Starting payment verification process...");
 
         // First try the verify-subscription endpoint
         try {
-          console.log("Calling verify-subscription endpoint...");
+          console.log(
+            "PaymentSuccess: Calling verify-subscription endpoint..."
+          );
           const response = await axios.get(
             `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
             {
@@ -36,20 +46,58 @@ const PaymentSuccess = () => {
             }
           );
 
-          console.log("Verify-subscription response:", response.data);
+          console.log(
+            "PaymentSuccess: Verify-subscription response:",
+            response.data
+          );
 
           if (response.data.success && response.data.isPay) {
-            console.log("Payment verified successfully");
+            console.log("PaymentSuccess: Payment verified successfully");
+            console.log(
+              "PaymentSuccess: Subscription status:",
+              response.data.subscriptionStatus
+            );
             setSubscriptionStatus(response.data.subscriptionStatus);
             setLoading(false);
+            // Redirect to preferences after a short delay
+            console.log(
+              "PaymentSuccess: Scheduling redirect to preferences..."
+            );
+            setTimeout(() => {
+              console.log("PaymentSuccess: Redirecting to preferences...");
+              navigate("/preferences");
+            }, 2000);
             return;
+          } else {
+            console.log(
+              "PaymentSuccess: Verify-subscription returned not paid"
+            );
           }
         } catch (verifyError) {
-          console.error("Error in verify-subscription:", verifyError);
+          console.error(
+            "PaymentSuccess: Error in verify-subscription:",
+            verifyError
+          );
+          console.error(
+            "PaymentSuccess: Error details:",
+            verifyError.response?.data || verifyError.message
+          );
         }
 
-        // If verification failed, try the status endpoint
-        console.log("Trying status endpoint as fallback...");
+        // If verification failed and we haven't exceeded max retries, retry after a delay
+        if (retryCount < maxRetries) {
+          console.log(
+            `PaymentSuccess: Retrying verification (attempt ${
+              retryCount + 1
+            }/${maxRetries})...`
+          );
+          setRetryCount((prev) => prev + 1);
+          setTimeout(fetchSubscriptionStatus, 2000); // Retry after 2 seconds
+          return;
+        }
+
+        // If all retries failed, try the status endpoint as a last resort
+        console.log("PaymentSuccess: Trying status endpoint as fallback...");
         const statusResponse = await axios.get(
           `${import.meta.env.VITE_BASE_API}/payments/status`,
           {
@@ -60,27 +108,50 @@ const PaymentSuccess = () => {
           }
         );
 
-        console.log("Status endpoint response:", statusResponse.data);
+        console.log(
+          "PaymentSuccess: Status endpoint response:",
+          statusResponse.data
+        );
 
         if (statusResponse.data.isPay) {
-          console.log("Payment status verified through status endpoint");
+          console.log(
+            "PaymentSuccess: Payment status verified through status endpoint"
+          );
+          console.log(
+            "PaymentSuccess: Subscription status:",
+            statusResponse.data.subscriptionStatus
+          );
           setSubscriptionStatus(statusResponse.data.subscriptionStatus);
+          setLoading(false);
+          // Redirect to preferences after a short delay
+          console.log("PaymentSuccess: Scheduling redirect to preferences...");
+          setTimeout(() => {
+            console.log("PaymentSuccess: Redirecting to preferences...");
+            navigate("/preferences");
+          }, 2000);
         } else {
-          console.error("Payment verification failed in both endpoints");
+          console.error(
+            "PaymentSuccess: Payment verification failed in both endpoints"
+          );
           setError("Payment verification failed. Please contact support.");
+          setLoading(false);
         }
-
-        setLoading(false);
       } catch (error) {
-        console.error("Error in payment verification process:", error);
-        console.error("Error details:", error.response?.data || error.message);
+        console.error(
+          "PaymentSuccess: Error in payment verification process:",
+          error
+        );
+        console.error(
+          "PaymentSuccess: Error details:",
+          error.response?.data || error.message
+        );
         setError("Failed to verify payment status");
         setLoading(false);
       }
     };
 
     fetchSubscriptionStatus();
-  }, []);
+  }, [navigate, retryCount, location.search]);
 
   if (loading) {
     return (
@@ -88,8 +159,14 @@ const PaymentSuccess = () => {
         <Header />
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Verifying payment status...</p>
+            <RefreshCw className="animate-spin h-12 w-12 text-blue-500 mx-auto" />
+            <p className="mt-4 text-gray-600">
+              {retryCount > 0
+                ? `Verifying payment status... (Attempt ${
+                    retryCount + 1
+                  }/${maxRetries})`
+                : "Verifying payment status..."}
+            </p>
           </div>
         </div>
       </div>
@@ -149,18 +226,18 @@ const PaymentSuccess = () => {
                   <div className="mt-2 text-sm text-green-700">
                     <p>
                       Thank you for your subscription! You now have access to
-                      all premium features.
+                      all premium features. Redirecting to preferences...
                     </p>
                   </div>
                 </div>
               </div>
               <div className="mt-5">
                 <Link
-                  to="/dashboard"
+                  to="/preferences"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <Home className="h-5 w-5 mr-2" />
-                  Go to Dashboard
+                  Go to Preferences
                 </Link>
               </div>
             </div>
