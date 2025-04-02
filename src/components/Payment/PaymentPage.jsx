@@ -16,56 +16,11 @@ const PaymentPage = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [subscriptionStatus, setSubscriptionStatus] = useState("none");
   const [isNewUser, setIsNewUser] = useState(false);
-  const [userId, setUserId] = useState("");
-  const [productId, setProductId] = useState("");
-
-  // Get user data from location state (passed from registration)
-  const userData = location.state?.userData;
-
-  // Add new function to verify payment status
-  const verifyPaymentStatus = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        throw new Error("No auth token found");
-      }
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-
-      console.log("Payment status verification:", response.data);
-
-      if (
-        response.data.success &&
-        response.data.isPay &&
-        response.data.subscriptionStatus === "active"
-      ) {
-        console.log("Payment verified successfully");
-        navigate("/dashboard");
-      } else {
-        console.log("Payment not yet processed, waiting...");
-        // Retry after 5 seconds
-        setTimeout(verifyPaymentStatus, 5000);
-      }
-    } catch (error) {
-      console.error("Error verifying payment status:", error);
-      setError("Failed to verify payment status");
-    }
-  };
 
   useEffect(() => {
     // Set isNewUser based on whether we came directly from registration
-    setIsNewUser(!!userData && location.state?.from === "register");
+    setIsNewUser(!!location.state?.from === "register");
 
     // If no auth token, redirect to register
     const token = localStorage.getItem("authToken");
@@ -75,70 +30,53 @@ const PaymentPage = () => {
       return;
     }
 
-    // Fetch checkout info
-    const fetchCheckoutInfo = async () => {
+    // Check subscription status
+    const checkSubscriptionStatus = async () => {
       try {
-        const currentToken = localStorage.getItem("authToken");
-        if (!currentToken) {
-          throw new Error("No authentication token available");
-        }
-
-        console.log(
-          "Fetching checkout info with token:",
-          currentToken.substring(0, 10) + "..."
-        );
-
         const response = await axios.get(
-          `${import.meta.env.VITE_BASE_API}/payments/checkout-info`,
+          `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
           {
             headers: {
-              Authorization: `Bearer ${currentToken}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,
           }
         );
 
-        console.log("Checkout info response:", response.data);
+        console.log("Subscription status:", response.data);
 
-        if (response.data.isPaid) {
-          console.log("User already has premium access");
-          navigate("/dashboard");
-          return;
+        if (response.data.success && response.data.isPay) {
+          console.log(
+            "User has active subscription, redirecting to preferences"
+          );
+          navigate("/preferences");
+        } else {
+          console.log("User needs to subscribe");
+          setLoading(false);
         }
-
-        setUserId(response.data.userId);
-        setProductId(response.data.productId);
-        setSubscriptionStatus(response.data.subscriptionStatus);
-        setLoading(false);
       } catch (error) {
-        console.error("Error fetching checkout info:", error);
+        console.error("Error checking subscription status:", error);
 
-        // Handle different types of errors
         if (error.response?.status === 401) {
           console.log("Token is invalid or expired, redirecting to register");
-          // Clear invalid token
           localStorage.removeItem("authToken");
           localStorage.removeItem("user");
-          // If we came from registration, show a message
           if (isNewUser) {
             setError(
               "Registration completed but authentication failed. Please try registering again."
             );
           }
           navigate("/register");
-        } else if (error.response?.status === 404) {
-          setError("User information not found. Please try registering again.");
-          navigate("/register");
         } else {
-          setError("Failed to load payment information. Please try again.");
+          setError("Failed to check subscription status. Please try again.");
         }
         setLoading(false);
       }
     };
 
-    fetchCheckoutInfo();
-  }, [userData, navigate, location.state, isNewUser]);
+    checkSubscriptionStatus();
+  }, [navigate, location.state, isNewUser]);
 
   if (loading) {
     return (
@@ -147,7 +85,9 @@ const PaymentPage = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <RefreshCw className="animate-spin h-8 w-8 mx-auto text-gray-400" />
-            <p className="mt-2 text-gray-500">Loading payment information...</p>
+            <p className="mt-2 text-gray-500">
+              Checking subscription status...
+            </p>
           </div>
         </div>
       </div>

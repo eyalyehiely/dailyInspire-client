@@ -95,6 +95,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     try {
+      // Get user email from localStorage
+      const userDataString = localStorage.getItem('user');
+      const userData = userDataString ? JSON.parse(userDataString) : null;
+      
       console.log('PaddleProvider: Opening checkout...');
       console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
       
@@ -104,14 +108,17 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           quantity: 1
         }],
         settings: {
-          theme: 'dark',
+          theme: 'light',
           displayMode: 'overlay',
           locale: 'en',
           successUrl: `${import.meta.env.VITE_APP_URL}/payment-success`,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
           }
-        }
+        },
+        customer: userData ? {
+          email: userData.email,
+        } : undefined,
       });
     } catch (error) {
       console.error('PaddleProvider: Error opening checkout:', error);
