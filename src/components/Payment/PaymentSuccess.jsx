@@ -11,7 +11,7 @@ const PaymentSuccess = () => {
   const [error, setError] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("active");
   const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 5;
+  const maxRetries = 3;
 
   useEffect(() => {
     console.log("PaymentSuccess: Component mounted");
@@ -46,7 +46,10 @@ const PaymentSuccess = () => {
           console.log("PaymentSuccess: Status response:", response.data);
 
           // Check if the response indicates a successful payment
-          if (response.data.isPay) {
+          if (
+            response.data.isPay &&
+            response.data.subscriptionStatus === "active"
+          ) {
             console.log("PaymentSuccess: Payment verified successfully");
             console.log(
               "PaymentSuccess: Subscription status:",
@@ -61,6 +64,7 @@ const PaymentSuccess = () => {
               const userData = JSON.parse(userDataString);
               userData.isPay = true;
               userData.subscriptionStatus = response.data.subscriptionStatus;
+              userData.subscriptionDetails = response.data.subscriptionDetails;
               localStorage.setItem("user", JSON.stringify(userData));
             }
 
@@ -72,6 +76,31 @@ const PaymentSuccess = () => {
               console.log("PaymentSuccess: Redirecting to preferences...");
               navigate("/preferences");
             }, 2000);
+            return;
+          } else if (response.data.error) {
+            // If there's a specific error from Paddle, show it
+            console.error(
+              "PaymentSuccess: Paddle API error:",
+              response.data.error
+            );
+            setError(response.data.error);
+            setLoading(false);
+            return;
+          } else if (response.data.subscriptionStatus === "cancelled") {
+            // If subscription is cancelled, show appropriate message
+            console.error("PaymentSuccess: Subscription cancelled");
+            setError(
+              "Your subscription has been cancelled. Please contact support."
+            );
+            setLoading(false);
+            return;
+          } else if (response.data.subscriptionStatus === "past_due") {
+            // If payment is past due, show appropriate message
+            console.error("PaymentSuccess: Payment past due");
+            setError(
+              "Your payment is past due. Please update your payment method."
+            );
+            setLoading(false);
             return;
           } else {
             console.log("PaymentSuccess: Payment not verified yet");
@@ -104,7 +133,22 @@ const PaymentSuccess = () => {
             "PaymentSuccess: Error details:",
             error.response?.data || error.message
           );
-          setError("Failed to verify payment status");
+
+          // If we haven't exceeded max retries and it's a server error, retry
+          if (retryCount < maxRetries && error.response?.status === 500) {
+            console.log(
+              `PaymentSuccess: Retrying after server error (attempt ${
+                retryCount + 1
+              }/${maxRetries})...`
+            );
+            setRetryCount((prev) => prev + 1);
+            setTimeout(fetchSubscriptionStatus, 2000);
+            return;
+          }
+
+          setError(
+            error.response?.data?.message || "Failed to verify payment status"
+          );
           setLoading(false);
         }
       } catch (error) {
