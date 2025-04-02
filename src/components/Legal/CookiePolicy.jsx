@@ -158,7 +158,7 @@ const CookiePolicy = () => {
             If you have any questions about our Cookie Policy, please contact us
             at:
           </p>
-          <p className="text-gray-700 font-medium">support@dailyinspire.com</p>
+          <p className="text-gray-700 font-medium">support@dailyinspire.xyz</p>
         </div>
 
         <p className="text-gray-500 text-center">
