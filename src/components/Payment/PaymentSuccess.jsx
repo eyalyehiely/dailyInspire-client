@@ -37,7 +37,7 @@ const PaymentSuccess = () => {
             "PaymentSuccess: Calling verify-subscription endpoint..."
           );
           const response = await axios.get(
-            `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
+            `${import.meta.env.VITE_BASE_API}/payments/status`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

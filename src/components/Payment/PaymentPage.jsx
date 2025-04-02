@@ -34,7 +34,7 @@ const PaymentPage = () => {
     const checkSubscriptionStatus = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
+          `${import.meta.env.VITE_BASE_API}/payments/status`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
