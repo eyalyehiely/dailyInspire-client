@@ -129,11 +129,11 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             console.log('PaddleProvider: Checkout closed');
           }
         },
+        customData: userData ? {
+          user_id: userData._id
+        } : undefined,
         customer: userData ? {
-          email: userData.email,
-          customData: {
-            user_id: userData._id
-          }
+          email: userData.email
         } : undefined,
       });
       console.log('PaddleProvider: Checkout opened successfully');
