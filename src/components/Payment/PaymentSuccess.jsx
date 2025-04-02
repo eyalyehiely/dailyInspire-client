@@ -15,30 +15,19 @@ const PaymentSuccess = () => {
         const token = localStorage.getItem("authToken");
 
         if (!token) {
+          console.error("No auth token found");
           setError("Authentication required");
           setLoading(false);
           return;
         }
 
-        // Get the current payment status
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        console.log("Starting payment verification process...");
 
-        console.log("Payment verification response:", response.data);
-
-        if (response.data.success && response.data.isPay) {
-          setSubscriptionStatus(response.data.subscriptionStatus);
-        } else {
-          // If payment is not verified, try checking the status endpoint
-          const statusResponse = await axios.get(
-            `${import.meta.env.VITE_BASE_API}/payments/status`,
+        // First try the verify-subscription endpoint
+        try {
+          console.log("Calling verify-subscription endpoint...");
+          const response = await axios.get(
+            `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -47,18 +36,44 @@ const PaymentSuccess = () => {
             }
           );
 
-          console.log("Payment status response:", statusResponse.data);
+          console.log("Verify-subscription response:", response.data);
 
-          if (statusResponse.data.isPay) {
-            setSubscriptionStatus(statusResponse.data.subscriptionStatus);
-          } else {
-            setError("Payment verification failed. Please contact support.");
+          if (response.data.success && response.data.isPay) {
+            console.log("Payment verified successfully");
+            setSubscriptionStatus(response.data.subscriptionStatus);
+            setLoading(false);
+            return;
           }
+        } catch (verifyError) {
+          console.error("Error in verify-subscription:", verifyError);
+        }
+
+        // If verification failed, try the status endpoint
+        console.log("Trying status endpoint as fallback...");
+        const statusResponse = await axios.get(
+          `${import.meta.env.VITE_BASE_API}/payments/status`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Status endpoint response:", statusResponse.data);
+
+        if (statusResponse.data.isPay) {
+          console.log("Payment status verified through status endpoint");
+          setSubscriptionStatus(statusResponse.data.subscriptionStatus);
+        } else {
+          console.error("Payment verification failed in both endpoints");
+          setError("Payment verification failed. Please contact support.");
         }
 
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching subscription status:", error);
+        console.error("Error in payment verification process:", error);
+        console.error("Error details:", error.response?.data || error.message);
         setError("Failed to verify payment status");
         setLoading(false);
       }
