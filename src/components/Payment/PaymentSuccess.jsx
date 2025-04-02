@@ -21,14 +21,39 @@ const PaymentSuccess = () => {
         }
 
         // Get the current payment status
-        const response = await axios.get("/api/payments/status", {
-          headers: { "x-auth-token": token },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_API}/payments/verify-subscription`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        if (response.data.isPaid) {
+        console.log("Payment verification response:", response.data);
+
+        if (response.data.success && response.data.isPay) {
           setSubscriptionStatus(response.data.subscriptionStatus);
         } else {
-          setError("Payment verification failed. Please contact support.");
+          // If payment is not verified, try checking the status endpoint
+          const statusResponse = await axios.get(
+            `${import.meta.env.VITE_BASE_API}/payments/status`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          console.log("Payment status response:", statusResponse.data);
+
+          if (statusResponse.data.isPay) {
+            setSubscriptionStatus(statusResponse.data.subscriptionStatus);
+          } else {
+            setError("Payment verification failed. Please contact support.");
+          }
         }
 
         setLoading(false);
