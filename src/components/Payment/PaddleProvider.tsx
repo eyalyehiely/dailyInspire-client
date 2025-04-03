@@ -72,10 +72,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         {
           subscriptionId,
           subscriptionStatus,
-          paymentInformation: {
-            cardBrand,
-            lastFour: cardLastFour
-          }
+          cardBrand,
+          cardLastFour
         },
         {
           headers: {
@@ -186,11 +184,14 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 } else {
                   console.log('PaddleProvider: User subscription update completed');
                 }
-                
-                // Redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
-                console.log('PaddleProvider: Redirecting to success URL:', successUrl);
-                window.location.href = successUrl;
+
+                // set hold time  for 3 seconds until redirect to success page
+                setTimeout(() => {
+                  // Redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
+                  console.log('PaddleProvider: Redirecting to success URL:', successUrl);
+                  window.location.href = successUrl;
+                }, 3000);
               } catch (error) {
                 console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
