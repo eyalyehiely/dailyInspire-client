@@ -126,6 +126,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               const subscriptionId = event.data?.items?.[0]?.subscription_id;
               const transactionId = event.data?.transaction_id;
               
+              
               if (!subscriptionId) {
                 console.error('PaddleProvider: No subscription ID found in checkout data');
                 return;
@@ -150,9 +151,13 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               
               // Redirect to success page with transaction ID
               if (transactionId) {
-                window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}`;
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
+                console.log('PaddleProvider: Redirecting to success URL:', successUrl);
+                window.location.href = successUrl;
               } else {
-                window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success`;
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+                console.log('PaddleProvider: Redirecting to success URL (no transaction ID):', successUrl);
+                window.location.href = successUrl;
               }
             } catch (error) {
               console.error('PaddleProvider: Error in checkout completion:', error);
@@ -208,7 +213,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           successUrl: successUrl,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
-
           }
         },
         customData: userData ? {
