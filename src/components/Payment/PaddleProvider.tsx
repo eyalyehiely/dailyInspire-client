@@ -60,7 +60,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
-  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string,  cardBrand: string ,cardLastFour: string) => {
+  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string, cardBrand: string, cardLastFour: string) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -72,8 +72,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         {
           subscriptionId,
           subscriptionStatus,
-          cardBrand: cardBrand,
-          cardLastFour: cardLastFour
+          paymentInformation: {
+            cardBrand,
+            lastFour: cardLastFour
+          }
         },
         {
           headers: {
