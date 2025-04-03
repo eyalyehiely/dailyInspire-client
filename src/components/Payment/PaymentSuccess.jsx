@@ -34,67 +34,11 @@ const PaymentSuccess = () => {
         const params = new URLSearchParams(location.search);
         const transaction_id = params.get("transaction_id");
 
-        // If no transaction_id is provided, check user's subscription status directly
         if (!transaction_id) {
-          console.log(
-            "PaymentSuccess: No transaction_id found in URL, checking subscription status directly"
-          );
-
-          try {
-            // Check user's subscription status
-            const statusResponse = await axios.get(
-              `${import.meta.env.VITE_BASE_API}/payments/status`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-
-            console.log(
-              "PaymentSuccess: Subscription status response:",
-              statusResponse.data
-            );
-
-            if (
-              statusResponse.data.isPay &&
-              statusResponse.data.subscriptionStatus === "active"
-            ) {
-              console.log("PaymentSuccess: User has active subscription");
-              setSubscriptionStatus("active");
-              setLoading(false);
-
-              // Redirect to preferences after a short delay
-              console.log(
-                "PaymentSuccess: Scheduling redirect to preferences..."
-              );
-              setTimeout(() => {
-                console.log("PaymentSuccess: Redirecting to preferences...");
-                navigate("/preferences");
-              }, 2000);
-              return;
-            } else {
-              console.log(
-                "PaymentSuccess: User does not have active subscription"
-              );
-              setError(
-                "No active subscription found. Please contact support if you believe this is an error."
-              );
-              setLoading(false);
-              return;
-            }
-          } catch (statusError) {
-            console.error(
-              "PaymentSuccess: Error checking subscription status:",
-              statusError
-            );
-            setError(
-              "Failed to verify subscription status. Please contact support."
-            );
-            setLoading(false);
-            return;
-          }
+          console.error("PaymentSuccess: No transaction_id found in URL");
+          setError("Transaction ID is required");
+          setLoading(false);
+          return;
         }
 
         console.log("PaymentSuccess: Starting payment verification process...");
@@ -136,9 +80,6 @@ const PaymentSuccess = () => {
               };
               localStorage.setItem("user", JSON.stringify(userData));
             }
-            console.log("PaymentSuccess: User data updated in localStorage");
-            console.log(userData);
-            
 
             // Update database
             setUpdateStatus("updating");
