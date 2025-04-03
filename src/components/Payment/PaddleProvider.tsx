@@ -137,21 +137,49 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               const cardLastFour = cardInfo?.last4 || '';
               console.log('PaddleProvider: Card info:', { cardBrand, cardLastFour });
               
-              // Extract subscription ID directly from the event data
-              const subscriptionId = event.data?.subscription_id;
-              console.log('PaddleProvider: Subscription ID from event:', subscriptionId);
-              
-              if (!subscriptionId) {
-                console.error('PaddleProvider: No subscription ID found in event data');
-                // Still redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
-                console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
-                window.location.href = successUrl;
-                return;
-              }
-              
-              // Update user subscription data with card information
+              // Make API call to our backend to get subscription ID from transaction
               try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                  throw new Error('No auth token found');
+                }
+                
+                console.log('PaddleProvider: Fetching transaction details from our backend');
+                const response = await axios.get(
+                  `${import.meta.env.VITE_BASE_API}/payments/verify-transaction/${transactionId}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json'
+                    }
+                  }
+                );
+                
+                console.log('PaddleProvider: Transaction details response:', response.data);
+                
+                if (!response.data.success) {
+                  console.error('PaddleProvider: Failed to verify transaction:', response.data.message);
+                  // Still redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
+                  console.log('PaddleProvider: Redirecting to success URL (verification failed):', successUrl);
+                  window.location.href = successUrl;
+                  return;
+                }
+                
+                // Extract subscription ID from the transaction details
+                const subscriptionId = response.data.transaction.subscription_id;
+                console.log('PaddleProvider: Subscription ID from API:', subscriptionId);
+                
+                if (!subscriptionId) {
+                  console.error('PaddleProvider: No subscription ID found in transaction details');
+                  // Still redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
+                  console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
+                  window.location.href = successUrl;
+                  return;
+                }
+                
+                // Update user subscription data with card information
                 const result = await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
                 
                 if (result) {
@@ -165,10 +193,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 console.log('PaddleProvider: Redirecting to success URL:', successUrl);
                 window.location.href = successUrl;
               } catch (error) {
-                console.error('PaddleProvider: Error updating user subscription:', error);
+                console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
                 const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
-                console.log('PaddleProvider: Redirecting to success URL (after error):', successUrl);
+                console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
                 window.location.href = successUrl;
               }
             } catch (error) {
