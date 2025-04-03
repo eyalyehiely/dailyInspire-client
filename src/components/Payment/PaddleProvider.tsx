@@ -157,7 +157,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 if (response.data.data.status !== "completed") {
                   console.error('PaddleProvider: Transaction not completed:', response.data.data.status);
                   // Still redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
                   console.log('PaddleProvider: Redirecting to success URL (transaction not completed):', successUrl);
                   window.location.href = successUrl;
                   return;
