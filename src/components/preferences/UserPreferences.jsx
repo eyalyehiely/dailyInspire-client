@@ -274,8 +274,28 @@ const UserPreferences = () => {
 
   // Function to format card brand for display
   const formatCardBrand = (brand) => {
-    if (!brand) return "";
-    return brand.charAt(0).toUpperCase() + brand.slice(1);
+    if (!brand) return "Card";
+    // Capitalize first letter and handle common card brands
+    const formattedBrand =
+      brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase();
+    switch (formattedBrand.toLowerCase()) {
+      case "visa":
+        return "Visa";
+      case "mastercard":
+        return "Mastercard";
+      case "amex":
+        return "American Express";
+      case "discover":
+        return "Discover";
+      default:
+        return formattedBrand;
+    }
+  };
+
+  // Function to format card number for display
+  const formatCardNumber = (lastFour) => {
+    if (!lastFour) return "••••";
+    return `•••• ${lastFour}`;
   };
 
   // Function to handle subscription cancellation
@@ -438,17 +458,31 @@ const UserPreferences = () => {
 
                           {/* Payment Method Information */}
                           {subscriptionData.cardBrand &&
-                            subscriptionData.cardLastFour && (
+                          subscriptionData.cardLastFour ? (
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-sm font-medium text-gray-700">
+                                Payment Method
+                              </span>
+                              <span className="text-sm font-medium text-gray-700 flex items-center">
+                                <CreditCard className="h-4 w-4 mr-1 text-gray-500" />
+                                {formatCardBrand(subscriptionData.cardBrand)}{" "}
+                                {formatCardNumber(
+                                  subscriptionData.cardLastFour
+                                )}
+                              </span>
+                            </div>
+                          ) : (
+                            subscriptionData.isPay && (
                               <div className="flex items-center justify-between mt-2">
                                 <span className="text-sm font-medium text-gray-700">
                                   Payment Method
                                 </span>
-                                <span className="text-sm font-medium text-gray-700">
-                                  {formatCardBrand(subscriptionData.cardBrand)}{" "}
-                                  •••• {subscriptionData.cardLastFour}
+                                <span className="text-sm text-gray-500 italic">
+                                  Card information not available
                                 </span>
                               </div>
-                            )}
+                            )
+                          )}
 
                           {/* Subscription Management Buttons */}
                           <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
