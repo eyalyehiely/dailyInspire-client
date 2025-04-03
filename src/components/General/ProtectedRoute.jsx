@@ -72,6 +72,19 @@ const ProtectedRoute = () => {
           setIsAuthenticated(true);
           setRegistrationComplete(false);
           navigate("/payment");
+        } else if (error.response && error.response.status === 403) {
+          // Handle other 403 errors - might be a temporary issue with registration status
+          console.log("Received 403 error, checking if user is authenticated");
+          setIsAuthenticated(true);
+
+          // Try to refresh the token or redirect to payment if needed
+          if (error.response.data.nextStep === "payment") {
+            setRegistrationComplete(false);
+            navigate("/payment");
+          } else {
+            // If we don't know what to do, assume registration is complete
+            setRegistrationComplete(true);
+          }
         } else {
           // Other errors: token invalid, server error, etc.
           console.error("Authentication error:", error);
