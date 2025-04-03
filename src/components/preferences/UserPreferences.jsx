@@ -492,7 +492,7 @@ const UserPreferences = () => {
                               Plan
                             </span>
                             <span className="text-sm font-medium text-gray-700">
-                              Premium ($1.99/month)
+                              Premium 💎
                             </span>
                           </div>
 
