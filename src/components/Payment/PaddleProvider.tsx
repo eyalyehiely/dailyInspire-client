@@ -124,7 +124,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             try {
               // Extract transaction ID from the event data
               console.log('PaddleProvider: Event data structure:', JSON.stringify(event.data, null, 2));
-              const transactionId = event.data?.data?.transaction_id;
+              const transactionId = event.data?.transaction_id;
               console.log('PaddleProvider: Transaction ID:', transactionId);
               
               if (!transactionId) {
@@ -133,7 +133,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               }
               
               // Extract card information from the event data
-              const cardInfo = event.data?.data?.payment?.method_details?.card;
+              const cardInfo = event.data?.payment?.method_details?.card;
               const cardBrand = cardInfo?.type || '';
               const cardLastFour = cardInfo?.last4 || '';
               console.log('PaddleProvider: Card info:', { cardBrand, cardLastFour });
@@ -151,6 +151,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 );
                 
                 console.log('PaddleProvider: Transaction details response:', response.data);
+                console.log('PaddleProvider: Transaction status:', response.data.data.status);
+                console.log('PaddleProvider: Transaction data structure:', JSON.stringify(response.data.data, null, 2));
                 
                 if (response.data.data.status !== "completed") {
                   console.error('PaddleProvider: Transaction not completed:', response.data.data.status);
@@ -162,7 +164,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 }
                 
                 // Extract subscription ID from the transaction details
-                const subscriptionId = response.data.data.transaction.subscription_id;
+                const subscriptionId = response.data.data.subscription_id;
                 console.log('PaddleProvider: Subscription ID from API:', subscriptionId);
                 
                 if (!subscriptionId) {
