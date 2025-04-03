@@ -29,12 +29,25 @@ const PaymentSuccess = () => {
           return;
         }
 
+        // Get transaction_id from URL parameters
+        const params = new URLSearchParams(location.search);
+        const transaction_id = params.get("transaction_id");
+
+        if (!transaction_id) {
+          console.error("PaymentSuccess: No transaction_id found in URL");
+          setError("Transaction ID is required");
+          setLoading(false);
+          return;
+        }
+
         console.log("PaymentSuccess: Starting payment verification process...");
 
         try {
           console.log("PaymentSuccess: Checking payment status...");
           const response = await axios.get(
-            `${import.meta.env.VITE_BASE_API}/payments/status`,
+            `${
+              import.meta.env.VITE_PADDLE_API_URL
+            }/transactions/${transaction_id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -43,30 +56,13 @@ const PaymentSuccess = () => {
             }
           );
 
-          console.log("PaymentSuccess: Status response:", response.data);
+          const transaction = response.data.data;
+          console.log("PaymentSuccess: Transaction data:", transaction);
 
-          // Check if there's an error from Paddle
-          if (response.data.error) {
-            console.error(
-              "PaymentSuccess: Paddle API error:",
-              response.data.error
-            );
-            setError(response.data.error);
-            setLoading(false);
-            return;
-          }
-
-          // Check if the response indicates a successful payment
-          if (
-            response.data.isPay &&
-            response.data.subscriptionStatus === "active"
-          ) {
+          // Check if the transaction is completed
+          if (transaction.status === "completed") {
             console.log("PaymentSuccess: Payment verified successfully");
-            console.log(
-              "PaymentSuccess: Subscription status:",
-              response.data.subscriptionStatus
-            );
-            setSubscriptionStatus(response.data.subscriptionStatus);
+            setSubscriptionStatus("active");
             setLoading(false);
 
             // Update user data in localStorage
@@ -74,8 +70,14 @@ const PaymentSuccess = () => {
             if (userDataString) {
               const userData = JSON.parse(userDataString);
               userData.isPay = true;
-              userData.subscriptionStatus = response.data.subscriptionStatus;
-              userData.subscriptionDetails = response.data.subscriptionDetails;
+              userData.subscriptionStatus = "active";
+              userData.subscriptionDetails = {
+                subscriptionId: transaction.subscription_id,
+                transactionId: transaction.id,
+                status: transaction.status,
+                currencyCode: transaction.currency_code,
+                billingPeriod: transaction.billing_period,
+              };
               localStorage.setItem("user", JSON.stringify(userData));
             }
 
@@ -88,32 +90,16 @@ const PaymentSuccess = () => {
               navigate("/preferences");
             }, 2000);
             return;
-          } else if (response.data.subscriptionStatus === "cancelled") {
-            console.error("PaymentSuccess: Subscription cancelled");
-            setError(
-              "Your subscription has been cancelled. Please contact support."
-            );
-            setLoading(false);
-            return;
-          } else if (response.data.subscriptionStatus === "past_due") {
+          } else if (transaction.status === "past_due") {
             console.error("PaymentSuccess: Payment past due");
             setError(
               "Your payment is past due. Please update your payment method."
             );
             setLoading(false);
             return;
-          } else if (response.data.subscriptionStatus === "trialing") {
-            console.log("PaymentSuccess: Subscription in trial period");
-            setSubscriptionStatus(response.data.subscriptionStatus);
-            setLoading(false);
-            return;
           } else {
             console.log("PaymentSuccess: Payment not verified yet");
-            console.log(
-              "PaymentSuccess: Current status:",
-              response.data.subscriptionStatus
-            );
-            console.log("PaymentSuccess: Is paid:", response.data.isPay);
+            console.log("PaymentSuccess: Current status:", transaction.status);
 
             // If we haven't exceeded max retries, retry after a delay
             if (retryCount < maxRetries) {
