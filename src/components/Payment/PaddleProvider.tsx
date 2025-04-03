@@ -123,6 +123,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
             try {
               // Extract transaction ID from the event data
+              console.log('PaddleProvider: Event data structure:', JSON.stringify(event.data, null, 2));
               const transactionId = event.data?.data?.transaction_id;
               console.log('PaddleProvider: Transaction ID:', transactionId);
               
@@ -153,8 +154,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 
                 if (response.data.data.status !== "completed") {
                   console.error('PaddleProvider: Transaction not completed:', response.data.data.status);
-                  // Still redirect to success page
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+                  // Still redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                   console.log('PaddleProvider: Redirecting to success URL (transaction not completed):', successUrl);
                   window.location.href = successUrl;
                   return;
@@ -166,8 +167,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 
                 if (!subscriptionId) {
                   console.error('PaddleProvider: No subscription ID found in transaction details');
-                  // Still redirect to success page
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+                  // Still redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                   console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
                   window.location.href = successUrl;
                   return;
@@ -183,13 +184,13 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 }
                 
                 // Redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}&t=${Date.now()}`;
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                 console.log('PaddleProvider: Redirecting to success URL:', successUrl);
                 window.location.href = successUrl;
               } catch (error) {
                 console.error('PaddleProvider: Error fetching transaction details:', error);
-                // Still redirect to success page
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+                // Still redirect to success page with transaction ID
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                 console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
                 window.location.href = successUrl;
               }

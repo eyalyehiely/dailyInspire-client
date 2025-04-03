@@ -38,6 +38,7 @@ const PaymentSuccess = () => {
           "PaymentSuccess: All URL parameters:",
           Object.fromEntries(params.entries())
         );
+        console.log("PaymentSuccess: Full URL:", window.location.href);
 
         if (!transaction_id) {
           console.log(
