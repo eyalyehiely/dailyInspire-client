@@ -56,8 +56,8 @@ const PaymentSuccess = () => {
           console.log("PaymentSuccess: Checking payment status...");
           const response = await axios.get(
             `${
-              import.meta.env.VITE_PADDLE_API_URL
-            }/transactions/${transaction_id}`,
+              import.meta.env.VITE_BASE_API
+            }/payments/verify-transaction/${transaction_id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -66,7 +66,14 @@ const PaymentSuccess = () => {
             }
           );
 
-          const transaction = response.data.data;
+          if (!response.data.success) {
+            console.error("PaymentSuccess: Payment verification failed");
+            setError(response.data.message || "Payment verification failed");
+            setLoading(false);
+            return;
+          }
+
+          const transaction = response.data.transaction;
           console.log("PaymentSuccess: Transaction data:", transaction);
 
           // Check if the transaction is completed
