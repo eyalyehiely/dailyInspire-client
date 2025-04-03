@@ -60,7 +60,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
-  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string) => {
+  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string, cardInfo?: { cardBrand: string; cardLastFour: string }) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -71,7 +71,9 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
         {
           subscriptionId,
-          subscriptionStatus
+          subscriptionStatus,
+          cardBrand: cardInfo?.cardBrand,
+          cardLastFour: cardInfo?.cardLastFour
         },
         {
           headers: {
@@ -120,13 +122,41 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             console.log('PaddleProvider: Checkout data:', event);
 
             try {
-              // Update user subscription data
-              await updateUserSubscription(event.data.data.subscription_id, 'active'
-              );
+              // Extract subscription ID from the items array
+              const subscriptionId = event.data?.items?.[0]?.subscription_id;
+              const transactionId = event.data?.transaction_id;
               
-              console.log('PaddleProvider: User subscription updated successfully');
+              if (!subscriptionId) {
+                console.error('PaddleProvider: No subscription ID found in checkout data');
+                return;
+              }
+              
+              // Extract card information if available
+              const cardInfo = event.data?.payment_information;
+              const cardBrand = cardInfo?.card_brand || '';
+              const cardLastFour = cardInfo?.last_four || '';
+
+              // Update user subscription data with card information
+              const result = await updateUserSubscription(subscriptionId, 'active', {
+                cardBrand,
+                cardLastFour
+              });
+              
+              if (result) {
+                console.log('PaddleProvider: User subscription updated successfully');
+              } else {
+                console.log('PaddleProvider: User subscription update completed');
+              }
+              
+              // Redirect to success page with transaction ID
+              if (transactionId) {
+                window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${transactionId}`;
+              } else {
+                window.location.href = `${import.meta.env.VITE_APP_URL}/payment-success`;
+              }
             } catch (error) {
-              console.error('PaddleProvider: Error updating user subscription:', error);
+              console.error('PaddleProvider: Error in checkout completion:', error);
+              // Don't set error state, just log it
             }
           }
         }
