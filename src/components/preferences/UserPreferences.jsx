@@ -162,14 +162,6 @@ const UserPreferences = () => {
     // Call both functions
     fetchPreferences();
     fetchSubscriptionData();
-
-
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
   }, [VITE_BASE_API, formData._id, navigate]);
 
   const handleChange = (e) => {
