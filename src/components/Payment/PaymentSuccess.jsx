@@ -136,6 +136,9 @@ const PaymentSuccess = () => {
               };
               localStorage.setItem("user", JSON.stringify(userData));
             }
+            console.log("PaymentSuccess: User data updated in localStorage");
+            console.log(userData);
+            
 
             // Update database
             setUpdateStatus("updating");
