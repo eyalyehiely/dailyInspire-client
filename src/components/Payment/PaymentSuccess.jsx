@@ -126,6 +126,10 @@ const PaymentSuccess = () => {
                   subscriptionId: subscriptionId,
                   subscriptionStatus: "active",
                   transactionId: transaction.id,
+                  cardBrand:
+                    transaction.payment?.method_details?.card?.type || "",
+                  cardLastFour:
+                    transaction.payment?.method_details?.card?.last4 || "",
                 },
                 {
                   headers: {
