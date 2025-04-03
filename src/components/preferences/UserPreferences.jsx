@@ -300,24 +300,62 @@ const UserPreferences = () => {
 
   // Function to handle subscription cancellation
   const handleCancelSubscription = async () => {
+    // Show confirmation dialog
+    if (
+      !window.confirm(
+        "Are you sure you want to cancel your subscription? You will continue to have access until the end of your current billing period."
+      )
+    ) {
+      return;
+    }
+
     try {
-      if (!subscriptionData.cancelSubscriptionUrl) {
-        throw new Error("No cancellation URL available");
+      setLoading(true);
+      setError("");
+
+      // First, cancel in Paddle
+      const response = await axios.post(
+        `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}/cancel`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.VITE_PADDLE_API_KEY}`,
+          },
+        }
+      );
+
+      console.log("Subscription cancellation response:", response.data);
+
+      // Update local user data
+      const userDataString = localStorage.getItem("user");
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        userData.subscriptionStatus = "cancelled";
+        userData.isPay = false;
+        localStorage.setItem("user", JSON.stringify(userData));
       }
 
-      // Open the cancellation URL in a new tab
-      window.open(subscriptionData.cancelSubscriptionUrl, "_blank");
+      // Update subscription data state
+      setSubscriptionData((prev) => ({
+        ...prev,
+        subscriptionStatus: "cancelled",
+        isPay: false,
+        quotesEnabled: false,
+        
+      }));
 
-      // Show success message
       setSuccessMessage(
-        "Subscription cancellation page opened. Please complete the cancellation process."
+        "Your subscription has been cancelled successfully. You will continue to have access until the end of your current billing period."
       );
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
       console.error("Error cancelling subscription:", error);
       setError(
-        "Failed to open cancellation page. Please try again or contact support."
+        "Failed to cancel subscription. Please try again or contact support."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
