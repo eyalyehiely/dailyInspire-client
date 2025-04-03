@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 const UserPreferences = () => {
   const VITE_BASE_API =
     import.meta.env.VITE_BASE_API || "http://localhost:3000/api";
+  const VITE_PADDLE_API_URL =
+    import.meta.env.VITE_PADDLE_API_URL || "https://api.paddle.com";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -342,7 +344,7 @@ const UserPreferences = () => {
         subscriptionStatus: "cancelled",
         isPay: false,
         quotesEnabled: false,
-        
+
       }));
 
       setSuccessMessage(
