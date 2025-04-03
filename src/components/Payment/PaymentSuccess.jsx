@@ -45,6 +45,17 @@ const PaymentSuccess = () => {
 
           console.log("PaymentSuccess: Status response:", response.data);
 
+          // Check if there's an error from Paddle
+          if (response.data.error) {
+            console.error(
+              "PaymentSuccess: Paddle API error:",
+              response.data.error
+            );
+            setError(response.data.error);
+            setLoading(false);
+            return;
+          }
+
           // Check if the response indicates a successful payment
           if (
             response.data.isPay &&
@@ -77,17 +88,7 @@ const PaymentSuccess = () => {
               navigate("/preferences");
             }, 2000);
             return;
-          } else if (response.data.error) {
-            // If there's a specific error from Paddle, show it
-            console.error(
-              "PaymentSuccess: Paddle API error:",
-              response.data.error
-            );
-            setError(response.data.error);
-            setLoading(false);
-            return;
           } else if (response.data.subscriptionStatus === "cancelled") {
-            // If subscription is cancelled, show appropriate message
             console.error("PaymentSuccess: Subscription cancelled");
             setError(
               "Your subscription has been cancelled. Please contact support."
@@ -95,15 +96,24 @@ const PaymentSuccess = () => {
             setLoading(false);
             return;
           } else if (response.data.subscriptionStatus === "past_due") {
-            // If payment is past due, show appropriate message
             console.error("PaymentSuccess: Payment past due");
             setError(
               "Your payment is past due. Please update your payment method."
             );
             setLoading(false);
             return;
+          } else if (response.data.subscriptionStatus === "trialing") {
+            console.log("PaymentSuccess: Subscription in trial period");
+            setSubscriptionStatus(response.data.subscriptionStatus);
+            setLoading(false);
+            return;
           } else {
             console.log("PaymentSuccess: Payment not verified yet");
+            console.log(
+              "PaymentSuccess: Current status:",
+              response.data.subscriptionStatus
+            );
+            console.log("PaymentSuccess: Is paid:", response.data.isPay);
 
             // If we haven't exceeded max retries, retry after a delay
             if (retryCount < maxRetries) {

@@ -108,22 +108,20 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       window.Paddle.Initialize({
         token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
-        eventCallback: async function(data: any) {
+        eventCallback: async function(event: any) {
           console.log('PaddleProvider: Paddle event received:', {
-            event: data.event,
-            data: data
+            event: event.name,
+            data: event
           });
           
           // Handle successful payment event
-          if (data.event === 'checkout.completed') {
+          if (event.name === 'checkout.completed') {
             console.log('PaddleProvider: Checkout completed event received');
-            console.log('PaddleProvider: Checkout data:', data);
-            
+            console.log('PaddleProvider: Checkout data:', event);
+
             try {
               // Update user subscription data
-              await updateUserSubscription(
-                data.data.subscription_id,
-                'active'
+              await updateUserSubscription(event.data.id, 'active'
               );
               
               console.log('PaddleProvider: User subscription updated successfully');
@@ -180,10 +178,11 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           successUrl: successUrl,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
+
           }
         },
         customData: userData ? {
-          user_id: userData._id
+          user_id: userData.id
         } : undefined,
         customer: userData ? {
           email: userData.email
