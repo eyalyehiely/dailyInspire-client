@@ -11,6 +11,7 @@ const PaymentSuccess = () => {
   const [error, setError] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("active");
   const [retryCount, setRetryCount] = useState(0);
+  const [updateStatus, setUpdateStatus] = useState("verifying");
   const maxRetries = 3;
 
   useEffect(() => {
@@ -63,7 +64,6 @@ const PaymentSuccess = () => {
           if (transaction.status === "completed") {
             console.log("PaymentSuccess: Payment verified successfully");
             setSubscriptionStatus("active");
-            setLoading(false);
 
             // Update user data in localStorage
             const userDataString = localStorage.getItem("user");
@@ -81,15 +81,52 @@ const PaymentSuccess = () => {
               localStorage.setItem("user", JSON.stringify(userData));
             }
 
-            // Redirect to preferences after a short delay
-            console.log(
-              "PaymentSuccess: Scheduling redirect to preferences..."
-            );
-            setTimeout(() => {
-              console.log("PaymentSuccess: Redirecting to preferences...");
-              navigate("/preferences");
-            }, 2000);
-            return;
+            // Update database
+            setUpdateStatus("updating");
+            try {
+              const updateResponse = await axios.post(
+                `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
+                {
+                  subscriptionId: transaction.subscription_id,
+                  subscriptionStatus: "active",
+                  transactionId: transaction.id,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              if (updateResponse.data.success) {
+                console.log("PaymentSuccess: Database updated successfully");
+                setUpdateStatus("completed");
+                setLoading(false);
+
+                // Redirect to preferences after a short delay
+                console.log(
+                  "PaymentSuccess: Scheduling redirect to preferences..."
+                );
+                setTimeout(() => {
+                  console.log("PaymentSuccess: Redirecting to preferences...");
+                  navigate("/preferences");
+                }, 2000);
+                return;
+              } else {
+                throw new Error("Database update failed");
+              }
+            } catch (updateError) {
+              console.error(
+                "PaymentSuccess: Error updating database:",
+                updateError
+              );
+              setError(
+                "Payment verified but database update failed. Please contact support."
+              );
+              setLoading(false);
+              return;
+            }
           } else if (transaction.status === "past_due") {
             console.error("PaymentSuccess: Payment past due");
             setError(
@@ -172,11 +209,13 @@ const PaymentSuccess = () => {
           <div className="text-center">
             <RefreshCw className="animate-spin h-12 w-12 text-blue-500 mx-auto" />
             <p className="mt-4 text-gray-600">
-              {retryCount > 0
-                ? `Verifying payment status... (Attempt ${
-                    retryCount + 1
-                  }/${maxRetries})`
-                : "Verifying payment status..."}
+              {updateStatus === "verifying"
+                ? retryCount > 0
+                  ? `Verifying payment status... (Attempt ${
+                      retryCount + 1
+                    }/${maxRetries})`
+                  : "Verifying payment status..."
+                : "Updating your account..."}
             </p>
           </div>
         </div>
