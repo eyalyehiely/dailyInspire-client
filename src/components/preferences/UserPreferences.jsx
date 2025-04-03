@@ -531,7 +531,7 @@ const UserPreferences = () => {
                               type="button"
                               className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                             >
-                              Manage Subscription
+                              Change Payment Method <CreditCard className="h-4 w-4 ml-2" />
                             </button>
 
                             <button
@@ -539,7 +539,7 @@ const UserPreferences = () => {
                               type="button"
                               className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
                             >
-                              Cancel Subscription
+                              Cancel Subscription <AlertTriangle className="h-4 w-4 ml-2" />
                             </button>
                           </div>
                         </>
