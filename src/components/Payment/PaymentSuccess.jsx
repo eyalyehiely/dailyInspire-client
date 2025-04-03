@@ -74,6 +74,24 @@ const PaymentSuccess = () => {
             console.log("PaymentSuccess: Payment verified successfully");
             setSubscriptionStatus("active");
 
+            // Extract subscription ID from the transaction
+            const subscriptionId = transaction.subscription_id;
+            console.log(
+              "PaymentSuccess: Subscription ID from transaction:",
+              subscriptionId
+            );
+
+            if (!subscriptionId) {
+              console.error(
+                "PaymentSuccess: No subscription ID found in transaction data"
+              );
+              setError(
+                "No subscription ID found. Please contact support if you believe this is an error."
+              );
+              setLoading(false);
+              return;
+            }
+
             // Update user data in localStorage
             const userDataString = localStorage.getItem("user");
             if (userDataString) {
@@ -81,7 +99,7 @@ const PaymentSuccess = () => {
               userData.isPay = true;
               userData.subscriptionStatus = "active";
               userData.subscriptionDetails = {
-                subscriptionId: transaction.subscription_id,
+                subscriptionId: subscriptionId,
                 transactionId: transaction.id,
                 status: transaction.status,
                 currencyCode: transaction.currency_code,
@@ -89,6 +107,7 @@ const PaymentSuccess = () => {
               };
               localStorage.setItem("user", JSON.stringify(userData));
             }
+            console.log("PaymentSuccess: User data updated in localStorage");
 
             // Update database
             setUpdateStatus("updating");
@@ -96,7 +115,7 @@ const PaymentSuccess = () => {
               const updateResponse = await axios.post(
                 `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
                 {
-                  subscriptionId: transaction.subscription_id,
+                  subscriptionId: subscriptionId,
                   subscriptionStatus: "active",
                   transactionId: transaction.id,
                 },

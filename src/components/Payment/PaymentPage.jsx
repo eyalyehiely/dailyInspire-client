@@ -104,7 +104,7 @@ const PaymentPage = () => {
       <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 mt-4">
               Upgrade to DailyInspire Premium
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -176,30 +176,6 @@ const PaymentPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Subscription Section */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 transform transition-all hover:scale-[1.02] duration-300">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mx-auto mb-6">
-                <Check className="h-8 w-8 text-green-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-                Start Your Journey
-              </h2>
-              <div className="text-center mb-8">
-                <p className="text-gray-600 mb-4">
-                  Join thousands of satisfied users who have upgraded to Premium
-                </p>
-                <div className="inline-flex items-center justify-center space-x-2 text-yellow-500 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-500">
-                  "DailyInspire Premium has transformed my daily routine" -
-                  Sarah M.
-                </p>
-              </div>
               <SubscriptionButton
                 priceId={import.meta.env.VITE_PADDLE_PRICE_ID}
                 className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all hover:scale-[1.02] duration-200 shadow-lg"
@@ -207,9 +183,6 @@ const PaymentPage = () => {
                 <Sparkles className="h-5 w-5 mr-2" />
                 Upgrade to Premium
               </SubscriptionButton>
-              <p className="mt-4 text-center text-sm text-gray-500">
-                Secure payment powered by Paddle
-              </p>
             </div>
           </div>
 
