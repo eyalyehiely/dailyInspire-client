@@ -138,6 +138,7 @@ const PaymentSuccess = () => {
             }
             console.log("PaymentSuccess: User data updated in localStorage");
             console.log(userData);
+            
 
             // Update database
             setUpdateStatus("updating");
@@ -317,37 +318,36 @@ const PaymentSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
-        <div className="max-w-md w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white shadow-xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.02] duration-300">
-            <div className="px-6 py-8 sm:p-10">
-              <div className="text-center">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                  <CheckCircle className="h-10 w-10 text-green-500 animate-bounce" />
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white shadow sm:rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-green-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Payment Successful!
-                </h3>
-                <div className="mt-4 text-lg text-gray-600">
-                  <p className="mb-4">
-                    Thank you for subscribing to DailyInspire Premium! 🎉
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    You now have access to all premium features. Redirecting to
-                    preferences...
-                  </p>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">
+                    Payment Successful
+                  </h3>
+                  <div className="mt-2 text-sm text-green-700">
+                    <p>
+                      Thank you for your subscription! You now have access to
+                      all premium features. Redirecting to preferences...
+                    </p>
+                  </div>
                 </div>
-                <div className="mt-8">
-                  <Link
-                    to="/preferences"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                  >
-                    <Home className="h-5 w-5 mr-2" />
-                    Go to Preferences
-                  </Link>
-                </div>
+              </div>
+              <div className="mt-5">
+                <Link
+                  to="/preferences"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <Home className="h-5 w-5 mr-2" />
+                  Go to Preferences
+                </Link>
               </div>
             </div>
           </div>
