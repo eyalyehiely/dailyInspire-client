@@ -99,7 +99,7 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white rounded-full flex items-center justify-center shadow-lg">
       <Header />
       <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 mt-4">
         <div className="w-full max-w-4xl mx-auto">
