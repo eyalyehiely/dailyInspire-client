@@ -210,11 +210,15 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
                 const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
-                console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
                 const subscriptionIdStored = localStorage.getItem('subscriptionId');
                 if (subscriptionIdStored) {
                   await updateUserSubscription(subscriptionIdStored, 'active', cardBrand, cardLastFour);
+                  console.log('user subscription updated', );
+                  localStorage.removeItem('subscriptionId');
+                  
                 }
+                console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
+                
                 window.location.href = successUrl;
               }
             } catch (error) {
