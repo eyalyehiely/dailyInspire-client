@@ -85,28 +85,7 @@ const UserPreferences = () => {
         });
 
         const { preferences } = response.data;
-        console.log("Preferences from API:", preferences);
-        console.log("Card details in preferences:", {
-          cardBrand: preferences.cardBrand,
-          cardLastFour: preferences.cardLastFour,
-        });
-
         setFormData(preferences);
-
-        // Update subscription data with card details from preferences if available
-        if (preferences.cardBrand && preferences.cardLastFour) {
-          console.log("Setting initial card details from preferences:", {
-            cardBrand: preferences.cardBrand,
-            cardLastFour: preferences.cardLastFour,
-          });
-
-          setSubscriptionData((prev) => ({
-            ...prev,
-            cardBrand: preferences.cardBrand,
-            cardLastFour: preferences.cardLastFour,
-          }));
-        }
-
         setLoading(false);
       } catch (error) {
         console.error("Error fetching preferences:", error);
@@ -135,10 +114,6 @@ const UserPreferences = () => {
         console.log("Subscription data response:", response.data);
         // Add more detailed logging
         console.log("isPay from response:", response.data.isPay);
-        console.log("Card details from API:", {
-          cardBrand: response.data.cardBrand,
-          cardLastFour: response.data.cardLastFour,
-        });
 
         const checkoutId = response.data.checkoutId;
         setCheckoutId(checkoutId);
@@ -159,10 +134,6 @@ const UserPreferences = () => {
         };
 
         console.log("Setting subscription data:", newSubscriptionData);
-        console.log("Card details being set:", {
-          cardBrand: newSubscriptionData.cardBrand,
-          cardLastFour: newSubscriptionData.cardLastFour,
-        });
         setSubscriptionData(newSubscriptionData);
 
         // Check subscription status and redirect if not paid
@@ -372,6 +343,7 @@ const UserPreferences = () => {
         subscriptionStatus: "cancelled",
         isPay: false,
         quotesEnabled: false,
+
       }));
 
       setSuccessMessage(
@@ -512,9 +484,7 @@ const UserPreferences = () => {
                         </div>
                       )}
 
-                      {(subscriptionData.subscriptionStatus === "active" ||
-                        subscriptionData.subscriptionStatus ===
-                          "cancelled") && (
+                      {subscriptionData.subscriptionStatus === "active" && (
                         <>
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">
@@ -526,14 +496,6 @@ const UserPreferences = () => {
                           </div>
 
                           {/* Payment Method Information */}
-                          {console.log("Checking card details for display:", {
-                            cardBrand: subscriptionData.cardBrand,
-                            cardLastFour: subscriptionData.cardLastFour,
-                            shouldShow: Boolean(
-                              subscriptionData.cardBrand &&
-                                subscriptionData.cardLastFour
-                            ),
-                          })}
                           {subscriptionData.cardBrand &&
                           subscriptionData.cardLastFour ? (
                             <div className="flex items-center justify-between mt-2">
@@ -561,28 +523,24 @@ const UserPreferences = () => {
                             )
                           )}
 
-                          {/* Only show subscription management buttons for active subscriptions */}
-                          {subscriptionData.subscriptionStatus === "active" && (
-                            <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
-                              <button
-                                onClick={handleManageSubscription}
-                                type="button"
-                                className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
-                              >
-                                Change Payment Method{" "}
-                                <CreditCard className="h-4 w-4 ml-2" />
-                              </button>
+                          {/* Subscription Management Buttons */}
+                          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                            <button
+                              onClick={handleManageSubscription}
+                              type="button"
+                              className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
+                            >
+                              Change Payment Method <CreditCard className="h-4 w-4 ml-2" />
+                            </button>
 
-                              <button
-                                onClick={handleCancelSubscription}
-                                type="button"
-                                className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
-                              >
-                                Cancel Subscription{" "}
-                                <AlertTriangle className="h-4 w-4 ml-2" />
-                              </button>
-                            </div>
-                          )}
+                            <button
+                              onClick={handleCancelSubscription}
+                              type="button"
+                              className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                            >
+                              Cancel Subscription <AlertTriangle className="h-4 w-4 ml-2" />
+                            </button>
+                          </div>
                         </>
                       )}
                     </>
