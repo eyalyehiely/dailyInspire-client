@@ -113,7 +113,6 @@ const UserPreferences = () => {
 
         console.log("Subscription data response:", response.data);
         // Add more detailed logging
-        console.log("isPaid from response:", response.data.isPaid);
         console.log("isPay from response:", response.data.isPay);
 
         const checkoutId = response.data.checkoutId;
