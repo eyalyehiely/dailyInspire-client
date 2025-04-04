@@ -150,9 +150,19 @@ const UserPreferences = () => {
 
         setSubscriptionChecked(true);
 
+        // Add logging to verify card information
+        console.log("Card Brand from response:", response.data.cardBrand);
+        console.log(
+          "Card Last Four from response:",
+          response.data.cardLastFour
+        );
+
         // Log subscription data state after update
         setTimeout(() => {
-          console.log("Current subscriptionData state:", subscriptionData);
+          console.log(
+            "Current subscriptionData state after update:",
+            subscriptionData
+          );
         }, 100);
       } catch (error) {
         console.error("Error fetching subscription data:", error);
@@ -343,7 +353,6 @@ const UserPreferences = () => {
         subscriptionStatus: "cancelled",
         isPay: false,
         quotesEnabled: false,
-
       }));
 
       setSuccessMessage(
@@ -511,16 +520,14 @@ const UserPreferences = () => {
                               </span>
                             </div>
                           ) : (
-                            subscriptionData.isPay && (
-                              <div className="flex items-center justify-between mt-2">
-                                <span className="text-sm font-medium text-gray-700">
-                                  Payment Method
-                                </span>
-                                <span className="text-sm text-gray-500 italic">
-                                  Card information not available
-                                </span>
-                              </div>
-                            )
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-sm font-medium text-gray-700">
+                                Payment Method
+                              </span>
+                              <span className="text-sm text-gray-500 italic">
+                                Card information not available
+                              </span>
+                            </div>
                           )}
 
                           {/* Subscription Management Buttons */}
@@ -530,7 +537,8 @@ const UserPreferences = () => {
                               type="button"
                               className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                             >
-                              Change Payment Method <CreditCard className="h-4 w-4 ml-2" />
+                              Change Payment Method{" "}
+                              <CreditCard className="h-4 w-4 ml-2" />
                             </button>
 
                             <button
@@ -538,7 +546,8 @@ const UserPreferences = () => {
                               type="button"
                               className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
                             >
-                              Cancel Subscription <AlertTriangle className="h-4 w-4 ml-2" />
+                              Cancel Subscription{" "}
+                              <AlertTriangle className="h-4 w-4 ml-2" />
                             </button>
                           </div>
                         </>
