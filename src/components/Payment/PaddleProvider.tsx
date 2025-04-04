@@ -144,9 +144,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               
               // Extract card information from the event data
               const cardInfo = event.data?.payment?.method_details?.card;
+              console.log('PaddleProvider: Raw card info:', cardInfo);
               const cardBrand = cardInfo?.type || '';
               const cardLastFour = cardInfo?.last4 || '';
-              console.log('PaddleProvider: Card info:', { cardBrand, cardLastFour });
+              console.log('PaddleProvider: Extracted card details:', { cardBrand, cardLastFour });
               
               // Make API call to Paddle to get transaction details
               try {
@@ -187,10 +188,11 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 }
                 
                 // Update user subscription data with card information
+                console.log('PaddleProvider: Updating user subscription with card details:', { cardBrand, cardLastFour });
                 const result = await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
                 
                 if (result) {
-                  console.log('PaddleProvider: User subscription updated successfully');
+                  console.log('PaddleProvider: User subscription updated successfully with card details');
                 } else {
                   console.log('PaddleProvider: User subscription update completed');
                 }
