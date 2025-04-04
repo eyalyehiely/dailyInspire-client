@@ -147,6 +147,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               console.log('PaddleProvider: Raw card info:', cardInfo);
               const cardBrand = cardInfo?.type || '';
               const cardLastFour = cardInfo?.last4 || '';
+              localStorage.setItem('cardBrand', cardBrand);
+              localStorage.setItem('cardLastFour', cardLastFour);
               console.log('PaddleProvider: Extracted card details:', { cardBrand, cardLastFour });
               
               // Make API call to Paddle to get transaction details
@@ -176,7 +178,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 
                 // Extract subscription ID from the transaction details
                 const subscriptionId = response.data.data.subscription_id;
-                localStorage.setItem('subscriptionId', subscriptionId);
                 console.log('PaddleProvider: Subscription ID from API:', subscriptionId);
                 
                 if (!subscriptionId) {
@@ -210,13 +211,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
                 const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
-                const subscriptionIdStored = localStorage.getItem('subscriptionId');
-                if (subscriptionIdStored) {
-                  await updateUserSubscription(subscriptionIdStored, 'active', cardBrand, cardLastFour);
-                  console.log('user subscription updated', );
-                  localStorage.removeItem('subscriptionId');
-                  
-                }
                 console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
                 
                 window.location.href = successUrl;
