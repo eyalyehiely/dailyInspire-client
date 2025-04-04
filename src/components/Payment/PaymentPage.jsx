@@ -178,7 +178,7 @@ const PaymentPage = () => {
               </div>
               <SubscriptionButton
                 priceId={import.meta.env.VITE_PADDLE_PRICE_ID}
-                className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all hover:scale-[1.02] duration-200 shadow-lg"
+                className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all hover:scale-[1.02] duration-200 shadow-lg mt-3"
               >
                 <Sparkles className="h-5 w-5 mr-2" />
                 Upgrade to Premium

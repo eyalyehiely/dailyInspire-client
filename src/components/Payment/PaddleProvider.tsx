@@ -182,6 +182,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                   console.error('PaddleProvider: No subscription ID found in transaction details');
                   // Still redirect to success page with transaction ID
                   const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
+                  await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
                   console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
                   window.location.href = successUrl;
                   return;
