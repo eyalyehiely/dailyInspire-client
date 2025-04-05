@@ -33,6 +33,10 @@ const PaymentSuccess = () => {
         // Get transaction_id from URL parameters
         const params = new URLSearchParams(location.search);
         const transaction_id = params.get("transaction_id");
+        const cardBrand = localStorage.getItem("cardBrand");
+        const cardLastFour = localStorage.getItem("cardLastFour");
+        localStorage.removeItem("cardBrand");
+        localStorage.removeItem("cardLastFour");
         console.log("PaymentSuccess: Transaction ID from URL:", transaction_id);
         console.log(
           "PaymentSuccess: All URL parameters:",
@@ -126,12 +130,8 @@ const PaymentSuccess = () => {
                   subscriptionId: subscriptionId,
                   subscriptionStatus: "active",
                   transactionId: transaction.id,
-                  paymentInformation: {
-                    cardBrand:
-                      transaction.payment?.method_details?.card.type || "",
-                    lastFour:
-                      transaction.payment?.method_details?.card.last4 || "",
-                  },
+                  cardBrand: cardBrand || "",
+                  cardLastFour: cardLastFour || "",
                 },
                 {
                   headers: {

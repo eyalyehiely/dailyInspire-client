@@ -84,7 +84,7 @@ const PaymentPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -99,9 +99,9 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center">
       <Header />
-      <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 mt-4">
         <div className="w-full max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4 mt-4">
@@ -113,7 +113,7 @@ const PaymentPage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-start">
+          <div className="grid md:grid-cols-2 gap-8 items-center justify-center">
             {/* Features Section */}
             <div className="bg-white rounded-2xl shadow-xl p-8 transform transition-all hover:scale-[1.02] duration-300">
               <div className="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-6">
@@ -178,7 +178,7 @@ const PaymentPage = () => {
               </div>
               <SubscriptionButton
                 priceId={import.meta.env.VITE_PADDLE_PRICE_ID}
-                className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all hover:scale-[1.02] duration-200 shadow-lg"
+                className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all hover:scale-[1.02] duration-200 shadow-lg mt-3"
               >
                 <Sparkles className="h-5 w-5 mr-2" />
                 Upgrade to Premium
