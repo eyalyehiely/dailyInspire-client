@@ -271,7 +271,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           user_id: userData.id
         } : undefined,
         customer: userData ? {
-          email: userData.email
+          email: userData.email,
+          name: userData.name
         } : undefined,
       });
       console.log('PaddleProvider: Checkout opened successfully');
