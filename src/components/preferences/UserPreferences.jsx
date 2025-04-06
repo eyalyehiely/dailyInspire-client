@@ -370,18 +370,23 @@ const UserPreferences = () => {
     }
   };
 
-
   const getPaddleUrlPortal = async () => {
-    const response = await axios.get(
-      `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
-        },
-      }
-    );
-    return response.data.data.management_urls.update_payment_method;
+    try {
+      const response = await axios.get(
+        `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
+          },
+        }
+      );
+      return response.data.data.management_urls.update_payment_method;
+    } catch (error) {
+      console.error("Error getting Paddle portal URL:", error);
+      setError("Failed to access customer portal. Please try again later.");
+      return null;
+    }
   };
 
   // Function to handle opening customer portal
