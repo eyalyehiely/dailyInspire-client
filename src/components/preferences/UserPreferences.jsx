@@ -368,11 +368,24 @@ const UserPreferences = () => {
       setLoading(false);
     }
   };
+  const getPaddleUrlPortal = (customerId) => {
+    response = axios.get(
+      `${VITE_PADDLE_API_URL}/customers/${customerId}/portal-sessions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.VITE_PADDLE_API_KEY}`,
+        },
+      }
+    );
+    return response.data.data.urls.general.overview;
+  };
 
   // Function to handle opening customer portal
-  const handleManageSubscription = () => {
-    if (subscriptionData.customerPortalUrl) {
-      window.open(subscriptionData.customerPortalUrl, "_blank");
+  const handleManageSubscription = (customerId) => {
+    const paddleUrlPortal = getPaddleUrlPortal(customerId);
+    if (paddleUrlPortal) {
+      window.open(paddleUrlPortal, "_blank");
     } else {
       setError("Unable to access customer portal. Please contact support.");
     }
@@ -533,21 +546,16 @@ const UserPreferences = () => {
                           {/* Subscription Management Buttons */}
                           <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
                             <button
-                              onClick={handleManageSubscription}
+                              onClick={() =>
+                                handleManageSubscription(
+                                  subscriptionData.userId
+                                )
+                              }
                               type="button"
                               className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                             >
-                              Change Payment Method{" "}
+                              Manage Subscription{" "}
                               <CreditCard className="h-4 w-4 ml-2" />
-                            </button>
-
-                            <button
-                              onClick={handleCancelSubscription}
-                              type="button"
-                              className="text-sm px-3 py-1.5 border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors"
-                            >
-                              Cancel Subscription{" "}
-                              <AlertTriangle className="h-4 w-4 ml-2" />
                             </button>
                           </div>
                         </>
