@@ -130,7 +130,9 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             try {
               // Extract transaction ID from the event data
               console.log('PaddleProvider: Event data structure:', JSON.stringify(event.data, null, 2));
-              const transactionId = event.data?.transactionId;
+              console.log('PaddleProvider: Raw transaction_id:', event.data?.transaction_id);
+              console.log('PaddleProvider: Raw event.data:', event.data);
+              const transactionId = event.data?.transaction_id;
               console.log('PaddleProvider: Transaction ID:', transactionId);
               
               if (!transactionId) {
