@@ -370,7 +370,8 @@ const UserPreferences = () => {
     }
   };
 
-  const getCustomerId = async () => {
+
+  const getPaddleUrlPortal = async () => {
     const response = await axios.post(
       `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
       {},
@@ -381,21 +382,7 @@ const UserPreferences = () => {
         },
       }
     );
-    return response.data.data.customer_id;
-  };
-
-  const getPaddleUrlPortal = async () => {
-    const customerId = await getCustomerId();
-    const response = axios.get(
-      `${VITE_PADDLE_API_URL}/customers/${customerId}/portal-sessions`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
-        },
-      }
-    );
-    return response.data.data.urls.general.overview;
+    return response.data.data.management_urls.update_payment_method;
   };
 
   // Function to handle opening customer portal
