@@ -372,9 +372,8 @@ const UserPreferences = () => {
 
 
   const getPaddleUrlPortal = async () => {
-    const response = await axios.post(
+    const response = await axios.get(
       `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
-      {},
       {
         headers: {
           "Content-Type": "application/json",
