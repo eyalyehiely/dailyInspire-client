@@ -747,7 +747,7 @@ const UserPreferences = () => {
             </div>
 
             {/* Add Delete Account Section */}
-            <div className="py-6 px-6 border-t border-gray-200">
+            {/* <div className="py-6 px-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                 <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
                 Danger Zone
@@ -759,7 +759,7 @@ const UserPreferences = () => {
                   onLogout={handleLogout}
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Action Buttons */}
             <div className="px-6 py-4 bg-gray-50 flex justify-end space-x-3 border-t border-gray-200">
