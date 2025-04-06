@@ -44,16 +44,16 @@ const PaymentSuccess = () => {
         );
         console.log("PaymentSuccess: Full URL:", window.location.href);
 
-        if (!transaction_id) {
-          console.log(
-            "PaymentSuccess: No transaction_id found in URL parameters"
-          );
-          setError(
-            "No transaction ID found. Please contact support if you believe this is an error."
-          );
-          setLoading(false);
-          return;
-        }
+        // if (!transaction_id) {
+        //   console.log(
+        //     "PaymentSuccess: No transaction_id found in URL parameters"
+        //   );
+        //   setError(
+        //     "No transaction ID found. Please contact support if you believe this is an error."
+        //   );
+        //   setLoading(false);
+        //   return;
+        // }
 
         console.log("PaymentSuccess: Starting payment verification process...");
 
