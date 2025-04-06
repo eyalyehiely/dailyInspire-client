@@ -303,7 +303,7 @@ const RegisterForm = ({ onLoginClick }) => {
               </label>
               <div className="relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Clock className="h-5 w-5 text-indigo-500" />
+                  <Clock className="h-5 w-5 text-indigo-500 mr-2" />
                 </div>
                 <input
                   type="time"
@@ -325,7 +325,7 @@ const RegisterForm = ({ onLoginClick }) => {
               </label>
               <div className="relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Globe className="h-5 w-5 text-indigo-500" />
+                  <Globe className="h-5 w-5 text-indigo-500 mr-2" />
                 </div>
                 <select
                   id="timeZone"
