@@ -111,6 +111,9 @@ const PaymentPage = () => {
               Unlock the full potential of DailyInspire with our premium
               features
             </p>
+            <p className="text-2xl font-semibold text-blue-600 mt-4">
+              Only $1.99/month
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 items-center justify-center">
