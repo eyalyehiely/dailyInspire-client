@@ -70,6 +70,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Get current date in Israel timezone
       const now = new Date();
       const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+
+      // Calculate next payment date (same date next month)
+      const nextPaymentDate = new Date(israelTime);
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
       
 
       const response = await axios.post(
@@ -80,6 +84,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           cardBrand,
           cardLastFour,
           firstPaymentDate: israelTime.toISOString(),
+          nextPaymentDate: nextPaymentDate.toISOString()
         },
         {
           headers: {
