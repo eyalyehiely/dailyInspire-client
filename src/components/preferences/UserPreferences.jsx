@@ -369,7 +369,23 @@ const UserPreferences = () => {
       setLoading(false);
     }
   };
-  const getPaddleUrlPortal = (customerId) => {
+
+  const getCustomerId = async () => {
+    const response = await axios.post(
+      `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.VITE_PADDLE_API_KEY}`,
+        },
+      }
+    );
+    return response.data.data.customer_id;
+  };
+
+  const getPaddleUrlPortal = async () => {
+    const customerId = await getCustomerId();
     const response = axios.get(
       `${VITE_PADDLE_API_URL}/customers/${customerId}/portal-sessions`,
       {
@@ -383,8 +399,8 @@ const UserPreferences = () => {
   };
 
   // Function to handle opening customer portal
-  const handleManageSubscription = (customerId) => {
-    const paddleUrlPortal = getPaddleUrlPortal(customerId);
+  const handleManageSubscription = async () => {
+    const paddleUrlPortal = await getPaddleUrlPortal();
     if (paddleUrlPortal) {
       window.open(paddleUrlPortal, "_blank");
     } else {
@@ -547,11 +563,7 @@ const UserPreferences = () => {
                           {/* Subscription Management Buttons */}
                           <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
                             <button
-                              onClick={() =>
-                                handleManageSubscription(
-                                  subscriptionData.userId
-                                )
-                              }
+                              onClick={handleManageSubscription}
                               type="button"
                               className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                             >
