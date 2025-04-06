@@ -377,7 +377,7 @@ const UserPreferences = () => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.VITE_PADDLE_API_KEY}`,
+          Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
         },
       }
     );
