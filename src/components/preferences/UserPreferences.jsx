@@ -402,7 +402,7 @@ const UserPreferences = () => {
       setError("");
       const paddleUrlPortal = await getPaddleUrlPortal();
       if (paddleUrlPortal) {
-        window.open(paddleUrlPortal, "_blank");
+        window.location.href = paddleUrlPortal;
       } else {
         setError("Unable to access customer portal. Please contact support.");
       }
