@@ -124,16 +124,12 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           
           // Handle successful payment event
           if (event.name === 'checkout.completed') {
-            setTimeout(() => {
-              console.log('PaddleProvider: Checkout completed event received');
-              console.log('PaddleProvider: Checkout data:', event);
-            }, 3000);
+            console.log('PaddleProvider: Checkout completed event received');
+            console.log('PaddleProvider: Checkout data:', event);
 
             try {
               // Extract transaction ID from the event data
               console.log('PaddleProvider: Event data structure:', JSON.stringify(event.data, null, 2));
-              console.log('PaddleProvider: Raw transaction_id:', event.data?.transaction_id);
-              console.log('PaddleProvider: Raw event.data:', event.data);
               const transactionId = event.data?.transaction_id;
               console.log('PaddleProvider: Transaction ID:', transactionId);
               
@@ -183,7 +179,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 if (!subscriptionId) {
                   console.error('PaddleProvider: No subscription ID found in transaction details');
                   // Still redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                   await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
                   console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
                   window.location.href = successUrl;
@@ -203,19 +199,17 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 // set hold time  for 3 seconds until redirect to success page
                 setTimeout(() => {
                   // Redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
                   console.log('PaddleProvider: Redirecting to success URL:', successUrl);
                   window.location.href = successUrl;
                 }, 3000);
               } catch (error) {
                 console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
-                setTimeout(() => {
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
-                  console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
-                  window.location.href = successUrl;
-                }, 6000);
-
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
+                console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
+                
+                window.location.href = successUrl;
               }
             } catch (error) {
               console.error('PaddleProvider: Error in checkout completion:', error);
@@ -277,8 +271,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           user_id: userData.id
         } : undefined,
         customer: userData ? {
-          email: userData.email,
-          name: userData.name
+          email: userData.email
         } : undefined,
       });
       console.log('PaddleProvider: Checkout opened successfully');
