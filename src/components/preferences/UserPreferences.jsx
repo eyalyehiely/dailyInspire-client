@@ -140,10 +140,11 @@ const UserPreferences = () => {
 
         // Check subscription status and redirect if not paid
         const isPaid = response.data.isPay;
+        const quotesEnabled = response.data.quotesEnabled;
         const status = response.data.subscriptionStatus;
 
         // Only allow users with active subscriptions to access preferences
-        if (!isPaid || (status !== "active" && status !== "cancelled")) {
+        if (!isPaid  || !quotesEnabled) {
           console.log(
             "User does not have an active subscription, redirecting to payment page"
           );
