@@ -124,8 +124,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           
           // Handle successful payment event
           if (event.name === 'checkout.completed') {
-            console.log('PaddleProvider: Checkout completed event received');
-            console.log('PaddleProvider: Checkout data:', event);
+            setTimeout(() => {
+              console.log('PaddleProvider: Checkout completed event received');
+              console.log('PaddleProvider: Checkout data:', event);
+            }, 3000);
 
             try {
               // Extract transaction ID from the event data
