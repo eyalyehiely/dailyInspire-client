@@ -26,6 +26,7 @@ const UserPreferences = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isManagingSubscription, setIsManagingSubscription] = useState(false);
   const VITE_PADDLE_API_KEY = import.meta.env.VITE_PADDLE_API_KEY;
 
   const [formData, setFormData] = useState({
@@ -396,11 +397,20 @@ const UserPreferences = () => {
 
   // Function to handle opening customer portal
   const handleManageSubscription = async () => {
-    const paddleUrlPortal = await getPaddleUrlPortal();
-    if (paddleUrlPortal) {
-      window.open(paddleUrlPortal, "_blank");
-    } else {
-      setError("Unable to access customer portal. Please contact support.");
+    try {
+      setIsManagingSubscription(true);
+      setError("");
+      const paddleUrlPortal = await getPaddleUrlPortal();
+      if (paddleUrlPortal) {
+        window.open(paddleUrlPortal, "_blank");
+      } else {
+        setError("Unable to access customer portal. Please contact support.");
+      }
+    } catch (error) {
+      console.error("Error managing subscription:", error);
+      setError("Failed to access customer portal. Please try again later.");
+    } finally {
+      setIsManagingSubscription(false);
     }
   };
 
@@ -561,10 +571,24 @@ const UserPreferences = () => {
                             <button
                               onClick={handleManageSubscription}
                               type="button"
-                              className="text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
+                              disabled={isManagingSubscription}
+                              className={`text-sm px-3 py-1.5 border border-indigo-300 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors flex items-center ${
+                                isManagingSubscription
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
                             >
-                              Manage Subscription{" "}
-                              <CreditCard className="h-4 w-4 ml-2" />
+                              {isManagingSubscription ? (
+                                <>
+                                  <Loader className="h-4 w-4 mr-2 animate-spin" />
+                                  Loading...
+                                </>
+                              ) : (
+                                <>
+                                  Manage Subscription{" "}
+                                  <CreditCard className="h-4 w-4 ml-2" />
+                                </>
+                              )}
                             </button>
                           </div>
                         </>
