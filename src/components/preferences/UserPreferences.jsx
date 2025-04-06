@@ -372,16 +372,21 @@ const UserPreferences = () => {
 
   const getPaddleUrlPortal = async () => {
     try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
       const response = await axios.get(
-        `${VITE_PADDLE_API_URL}/subscriptions/${subscriptionData.subscriptionId}`,
+        `${VITE_BASE_API}/payments/subscription-management-url`,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      return response.data.data.management_urls.update_payment_method;
+      return response.data.managementUrl;
     } catch (error) {
       console.error("Error getting Paddle portal URL:", error);
       setError("Failed to access customer portal. Please try again later.");
