@@ -26,6 +26,7 @@ const UserPreferences = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const VITE_PADDLE_API_KEY = import.meta.env.VITE_PADDLE_API_KEY;
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -369,12 +370,12 @@ const UserPreferences = () => {
     }
   };
   const getPaddleUrlPortal = (customerId) => {
-    response = axios.get(
+    const response = axios.get(
       `${VITE_PADDLE_API_URL}/customers/${customerId}/portal-sessions`,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.VITE_PADDLE_API_KEY}`,
+          Authorization: `Bearer ${VITE_PADDLE_API_KEY}`,
         },
       }
     );
