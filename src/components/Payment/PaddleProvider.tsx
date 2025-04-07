@@ -121,20 +121,20 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 if (response.data.message === 'Transaction verified successfully') {
                   console.log('PaddleProvider: Transaction verified successfully');
                   // Redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
                   console.log('PaddleProvider: Redirecting to success URL:', successUrl);
                   window.location.href = successUrl;
                 } else {
                   console.error('PaddleProvider: Transaction verification failed:', response.data.message);
                   // Still redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
                   console.log('PaddleProvider: Redirecting to success URL (verification failed):', successUrl);
                   window.location.href = successUrl;
                 }
               } catch (error) {
                 console.error('PaddleProvider: Error verifying transaction:', error);
                 // Still redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
                 console.log('PaddleProvider: Redirecting to success URL (error):', successUrl);
                 window.location.href = successUrl;
               }
@@ -176,10 +176,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('PaddleProvider: User data:', userData);
       console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
       
-      // Create a unique success URL with timestamp to prevent caching
-      const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}}`;
-      console.log('PaddleProvider: Success URL:', successUrl);
-      
       window.Paddle.Checkout.open({
         items: [{
           priceId: priceId,
@@ -189,7 +185,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           theme: 'light',
           displayMode: 'overlay',
           locale: 'en',
-          successUrl: successUrl,
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
           }

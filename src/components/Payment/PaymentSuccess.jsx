@@ -34,10 +34,8 @@ const PaymentSuccess = () => {
         // Get transaction_id from URL parameters
         const params = new URLSearchParams(location.search);
         const transaction_id = params.get("transaction_id");
-        const cardBrand = localStorage.getItem("cardBrand");
-        const cardLastFour = localStorage.getItem("cardLastFour");
-        localStorage.removeItem("cardBrand");
-        localStorage.removeItem("cardLastFour");
+        const cardBrand = params.get("cardbrand");
+        const cardLastFour = params.get("cardlastfour");
 
         if (!transaction_id) {
           console.error("PaymentSuccess: No transaction_id found");
@@ -49,7 +47,8 @@ const PaymentSuccess = () => {
         }
 
         console.log("PaymentSuccess: Starting payment verification process...");
-        // make a request to the server to verify the transaction add 4 seconds delay
+
+        // Add a delay before verification to ensure Paddle has processed the transaction
         setTimeout(async () => {
           try {
             console.log("PaymentSuccess: Checking payment status...");
@@ -104,7 +103,7 @@ const PaymentSuccess = () => {
             } else {
               setError(
                 error.response?.data?.message ||
-                  "Failed to verify payment status"
+                  "Failed to verify payment status. Please contact support if you believe this is an error."
               );
               setLoading(false);
             }
@@ -112,7 +111,9 @@ const PaymentSuccess = () => {
         }, 4000);
       } catch (error) {
         console.error("PaymentSuccess: Error:", error);
-        setError("Failed to verify payment status");
+        setError(
+          "Failed to verify payment status. Please contact support if you believe this is an error."
+        );
         setLoading(false);
       }
     };
