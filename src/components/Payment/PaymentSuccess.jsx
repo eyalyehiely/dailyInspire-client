@@ -56,10 +56,11 @@ const PaymentSuccess = () => {
         // }
 
         console.log("PaymentSuccess: Starting payment verification process...");
-
-        try {
-          console.log("PaymentSuccess: Checking payment status...");
-          const response = await axios.get(
+        // make a request to the server to verify the transaction add 4 seconds delay
+        setTimeout(async () => {      
+          try { 
+            console.log("PaymentSuccess: Checking payment status...");
+            const response = await axios.get(
             `${
               import.meta.env.VITE_BASE_API
             }/payments/verify-transaction/${transaction_id}`,
@@ -226,6 +227,7 @@ const PaymentSuccess = () => {
           );
           setLoading(false);
         }
+      }, 4000);
       } catch (error) {
         console.error(
           "PaymentSuccess: Error in payment verification process:",
