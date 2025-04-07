@@ -183,9 +183,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 
                 if (!subscriptionId) {
                   console.error('PaddleProvider: No subscription ID found in transaction details');
-                  // Still redirect to success page with transaction ID
+                  // Redirect to success page with transaction ID but don't update subscription
                   const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
-                  await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
                   console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
                   window.location.href = successUrl;
                   return;
@@ -201,13 +200,10 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                   console.log('PaddleProvider: User subscription update completed');
                 }
 
-                // set hold time  for 3 seconds until redirect to success page
-                setTimeout(() => {
-                  // Redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
-                  console.log('PaddleProvider: Redirecting to success URL:', successUrl);
-                  window.location.href = successUrl;
-                }, 3000);
+                // Redirect to success page with transaction ID
+                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                console.log('PaddleProvider: Redirecting to success URL:', successUrl);
+                window.location.href = successUrl;
               } catch (error) {
                 console.error('PaddleProvider: Error fetching transaction details:', error);
                 // Still redirect to success page with transaction ID
