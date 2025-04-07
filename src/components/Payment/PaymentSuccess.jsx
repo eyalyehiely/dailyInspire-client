@@ -12,6 +12,7 @@ const PaymentSuccess = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState("active");
   const [retryCount, setRetryCount] = useState(0);
   const [updateStatus, setUpdateStatus] = useState("verifying");
+  const [transactionVerified, setTransactionVerified] = useState(false);
   const maxRetries = 3;
 
   useEffect(() => {
@@ -37,206 +38,80 @@ const PaymentSuccess = () => {
         const cardLastFour = localStorage.getItem("cardLastFour");
         localStorage.removeItem("cardBrand");
         localStorage.removeItem("cardLastFour");
-        console.log("PaymentSuccess: Transaction ID from URL:", transaction_id);
-        console.log(
-          "PaymentSuccess: All URL parameters:",
-          Object.fromEntries(params.entries())
-        );
-        console.log("PaymentSuccess: Full URL:", window.location.href);
 
-        // if (!transaction_id) {
-        //   console.log(
-        //     "PaymentSuccess: No transaction_id found in URL parameters"
-        //   );
-        //   setError(
-        //     "No transaction ID found. Please contact support if you believe this is an error."
-        //   );
-        //   setLoading(false);
-        //   return;
-        // }
+        if (!transaction_id) {
+          console.error("PaymentSuccess: No transaction_id found");
+          setError(
+            "No transaction ID found. Please contact support if you believe this is an error."
+          );
+          setLoading(false);
+          return;
+        }
 
         console.log("PaymentSuccess: Starting payment verification process...");
         // make a request to the server to verify the transaction add 4 seconds delay
-        setTimeout(async () => {      
-          try { 
+        setTimeout(async () => {
+          try {
             console.log("PaymentSuccess: Checking payment status...");
             const response = await axios.get(
-            `${
-              import.meta.env.VITE_BASE_API
-            }/payments/verify-transaction/${transaction_id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (!response.data.success) {
-            console.error("PaymentSuccess: Payment verification failed");
-            setError(response.data.message || "Payment verification failed");
-            setLoading(false);
-            return;
-          }
-
-          const transaction = response.data.transaction;
-          console.log("PaymentSuccess: Transaction data:", transaction);
-
-          // Check if the transaction is completed
-          if (transaction.status === "completed") {
-            console.log("PaymentSuccess: Payment verified successfully");
-            setSubscriptionStatus("active");
-
-            // Extract subscription ID from the transaction
-            const subscriptionId = transaction.subscription_id;
-            console.log(
-              "PaymentSuccess: Subscription ID from transaction:",
-              subscriptionId
-            );
-
-            if (!subscriptionId) {
-              console.error(
-                "PaymentSuccess: No subscription ID found in transaction data"
-              );
-              setError(
-                "No subscription ID found. Please contact support if you believe this is an error."
-              );
-              setLoading(false);
-              return;
-            }
-
-            // Update user data in localStorage
-            const userDataString = localStorage.getItem("user");
-            if (userDataString) {
-              const userData = JSON.parse(userDataString);
-              userData.isPay = true;
-              userData.subscriptionStatus = "active";
-              userData.subscriptionDetails = {
-                subscriptionId: subscriptionId,
-                transactionId: transaction.id,
-                status: transaction.status,
-                currencyCode: transaction.currency_code,
-                billingPeriod: transaction.billing_period,
-              };
-              localStorage.setItem("user", JSON.stringify(userData));
-            }
-            console.log("PaymentSuccess: User data updated in localStorage");
-
-            // Update database
-            setUpdateStatus("updating");
-            try {
-              const updateResponse = await axios.post(
-                `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
-                {
-                  subscriptionId: subscriptionId,
-                  subscriptionStatus: "active",
-                  transactionId: transaction.id,
-                  cardBrand: cardBrand || "",
-                  cardLastFour: cardLastFour || "",
+              `${
+                import.meta.env.VITE_BASE_API
+              }/payments/verify-transaction/${transaction_id}?cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
                 },
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-
-              if (updateResponse.data.success) {
-                console.log("PaymentSuccess: Database updated successfully");
-                setUpdateStatus("completed");
-                setLoading(false);
-
-                // Redirect to preferences after a short delay
-                console.log(
-                  "PaymentSuccess: Scheduling redirect to preferences..."
-                );
-                setTimeout(() => {
-                  console.log("PaymentSuccess: Redirecting to preferences...");
-                  navigate("/preferences");
-                }, 2000);
-                return;
-              } else {
-                throw new Error("Database update failed");
               }
-            } catch (updateError) {
-              console.error(
-                "PaymentSuccess: Error updating database:",
-                updateError
+            );
+
+            if (
+              response.data &&
+              response.data.message === "Transaction verified successfully"
+            ) {
+              console.log("PaymentSuccess: Payment verified successfully");
+              setTransactionVerified(true);
+              setSubscriptionStatus("active");
+              setLoading(false);
+
+              // Update user data in localStorage
+              const userDataString = localStorage.getItem("user");
+              if (userDataString) {
+                const userData = JSON.parse(userDataString);
+                userData.isPay = true;
+                userData.subscriptionStatus = "active";
+                localStorage.setItem("user", JSON.stringify(userData));
+              }
+
+              // Redirect to preferences after a short delay
+              setTimeout(() => {
+                navigate("/preferences");
+              }, 2000);
+            } else {
+              throw new Error(
+                response.data.message || "Payment verification failed"
               );
+            }
+          } catch (error) {
+            console.error(
+              "PaymentSuccess: Error in payment verification:",
+              error
+            );
+
+            if (retryCount < maxRetries) {
+              setRetryCount((prev) => prev + 1);
+              setTimeout(fetchSubscriptionStatus, 2000);
+            } else {
               setError(
-                "Payment verified but database update failed. Please contact support."
+                error.response?.data?.message ||
+                  "Failed to verify payment status"
               );
               setLoading(false);
-              return;
-            }
-          } else if (transaction.status === "past_due") {
-            console.error("PaymentSuccess: Payment past due");
-            setError(
-              "Your payment is past due. Please update your payment method."
-            );
-            setLoading(false);
-            return;
-          } else {
-            console.log("PaymentSuccess: Payment not verified yet");
-            console.log("PaymentSuccess: Current status:", transaction.status);
-
-            // If we haven't exceeded max retries, retry after a delay
-            if (retryCount < maxRetries) {
-              console.log(
-                `PaymentSuccess: Retrying verification (attempt ${
-                  retryCount + 1
-                }/${maxRetries})...`
-              );
-              setRetryCount((prev) => prev + 1);
-              setTimeout(fetchSubscriptionStatus, 2000); // Retry after 2 seconds
-              return;
             }
           }
-
-          // If we get here, all retries failed
-          console.error(
-            "PaymentSuccess: Payment verification failed after all retries"
-          );
-          setError("Payment verification failed. Please contact support.");
-          setLoading(false);
-        } catch (error) {
-          console.error(
-            "PaymentSuccess: Error in payment verification process:",
-            error
-          );
-          console.error(
-            "PaymentSuccess: Error details:",
-            error.response?.data || error.message
-          );
-
-          // If we haven't exceeded max retries and it's a server error, retry
-          if (retryCount < maxRetries && error.response?.status === 500) {
-            console.log(
-              `PaymentSuccess: Retrying after server error (attempt ${
-                retryCount + 1
-              }/${maxRetries})...`
-            );
-            setRetryCount((prev) => prev + 1);
-            setTimeout(fetchSubscriptionStatus, 2000);
-            return;
-          }
-
-          setError(
-            error.response?.data?.message || "Failed to verify payment status"
-          );
-          setLoading(false);
-        }
-      }, 4000);
+        }, 4000);
       } catch (error) {
-        console.error(
-          "PaymentSuccess: Error in payment verification process:",
-          error
-        );
-        console.error(
-          "PaymentSuccess: Error details:",
-          error.response?.data || error.message
-        );
+        console.error("PaymentSuccess: Error:", error);
         setError("Failed to verify payment status");
         setLoading(false);
       }
@@ -267,7 +142,7 @@ const PaymentSuccess = () => {
     );
   }
 
-  if (error) {
+  if (error && !transactionVerified) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -280,7 +155,9 @@ const PaymentSuccess = () => {
                     <AlertCircle className="h-5 w-5 text-red-400" />
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Error</h3>
+                    <h3 className="text-sm font-medium text-red-800">
+                      Payment Error
+                    </h3>
                     <div className="mt-2 text-sm text-red-700">
                       <p>{error}</p>
                     </div>
