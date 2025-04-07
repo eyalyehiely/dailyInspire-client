@@ -60,60 +60,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
-  const updateUserSubscription = async (subscriptionId: string, subscriptionStatus: string, cardBrand: string, cardLastFour: string) => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error('No auth token found');
-      }
-
-      // Get current date in Israel timezone
-      const now = new Date();
-      const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-
-      // Calculate next payment date (same date next month)
-      const nextPaymentDate = new Date(israelTime);
-      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
-      
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_API}/payments/update-user-data`,
-        {
-          subscriptionId,
-          subscriptionStatus,
-          cardBrand,
-          cardLastFour,
-          firstPaymentDate: israelTime.toISOString(),
-          nextPaymentDate: nextPaymentDate.toISOString()
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data.success) {
-        // Update local storage with new user data
-        const userDataString = localStorage.getItem('user');
-        if (userDataString) {
-          const userData = JSON.parse(userDataString);
-          const updatedUserData = {
-            ...userData,
-            ...response.data.user
-          };
-          localStorage.setItem('user', JSON.stringify(updatedUserData));
-        }
-      }
-
-      return response.data;
-    } catch (error) {
-      console.error('Error updating user subscription:', error);
-      throw error;
-    }
-  };
-
   const setupPaddle = () => {
     try {
       console.log('PaddleProvider: Setting up Paddle...');
@@ -153,64 +99,43 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               localStorage.setItem('cardLastFour', cardLastFour);
               console.log('PaddleProvider: Extracted card details:', { cardBrand, cardLastFour });
               
-              // Make API call to Paddle to get transaction details
+              // Make API call to our backend to verify transaction
               try {
-                console.log('PaddleProvider: Fetching transaction details from Paddle API');
+                console.log('PaddleProvider: Verifying transaction through backend');
                 const response = await axios.get(
-                  `${import.meta.env.VITE_PADDLE_API_URL}/transactions/${transactionId}`,
+                  `${import.meta.env.VITE_BASE_API}/api/payments/verify-transaction/${transactionId}`,
                   {
                     headers: {
-                      'Content-Type': 'application/json'
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    params: {
+                      cardBrand,
+                      cardLastFour
                     }
                   }
                 );
                 
-                console.log('PaddleProvider: Transaction details response:', response.data);
-                console.log('PaddleProvider: Transaction status:', response.data.data.status);
-                console.log('PaddleProvider: Transaction data structure:', JSON.stringify(response.data.data, null, 2));
+                console.log('PaddleProvider: Transaction verification response:', response.data);
                 
-                if (response.data.data.status !== "completed") {
-                  console.error('PaddleProvider: Transaction not completed:', response.data.data.status);
+                if (response.data.message === 'Transaction verified successfully') {
+                  console.log('PaddleProvider: Transaction verified successfully');
+                  // Redirect to success page with transaction ID
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
+                  console.log('PaddleProvider: Redirecting to success URL:', successUrl);
+                  window.location.href = successUrl;
+                } else {
+                  console.error('PaddleProvider: Transaction verification failed:', response.data.message);
                   // Still redirect to success page with transaction ID
                   const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
-                  console.log('PaddleProvider: Redirecting to success URL (transaction not completed):', successUrl);
+                  console.log('PaddleProvider: Redirecting to success URL (verification failed):', successUrl);
                   window.location.href = successUrl;
-                  return;
                 }
-                
-                // Extract subscription ID from the transaction details
-                const subscriptionId = response.data.data.subscription_id;
-                console.log('PaddleProvider: Subscription ID from API:', subscriptionId);
-                
-                if (!subscriptionId) {
-                  console.error('PaddleProvider: No subscription ID found in transaction details');
-                  // Redirect to success page with transaction ID but don't update subscription
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}`;
-                  console.log('PaddleProvider: Redirecting to success URL (no subscription ID):', successUrl);
-                  window.location.href = successUrl;
-                  return;
-                }
-                
-                // Update user subscription data with card information
-                console.log('PaddleProvider: Updating user subscription with card details:', { cardBrand, cardLastFour });
-                const result = await updateUserSubscription(subscriptionId, 'active', cardBrand, cardLastFour);
-                
-                if (result) {
-                  console.log('PaddleProvider: User subscription updated successfully with card details');
-                } else {
-                  console.log('PaddleProvider: User subscription update completed');
-                }
-
-                // Redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
-                console.log('PaddleProvider: Redirecting to success URL:', successUrl);
-                window.location.href = successUrl;
               } catch (error) {
-                console.error('PaddleProvider: Error fetching transaction details:', error);
+                console.error('PaddleProvider: Error verifying transaction:', error);
                 // Still redirect to success page with transaction ID
                 const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?transaction_id=${encodeURIComponent(transactionId)}&t=${Date.now()}&cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`;
-                console.log('PaddleProvider: Redirecting to success URL (after API error):', successUrl);
-                
+                console.log('PaddleProvider: Redirecting to success URL (error):', successUrl);
                 window.location.href = successUrl;
               }
             } catch (error) {
@@ -252,7 +177,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('PaddleProvider: Using product ID:', import.meta.env.VITE_PADDLE_PRODUCT_ID);
       
       // Create a unique success URL with timestamp to prevent caching
-      const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`;
+      const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}}`;
       console.log('PaddleProvider: Success URL:', successUrl);
       
       window.Paddle.Checkout.open({
