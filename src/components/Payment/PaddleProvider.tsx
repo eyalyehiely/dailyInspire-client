@@ -183,7 +183,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           theme: 'light',
           displayMode: 'overlay',
           locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}`,
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(localStorage.getItem('transactionId') || '')}`,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
           }

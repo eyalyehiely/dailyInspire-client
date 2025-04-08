@@ -33,9 +33,18 @@ const PaymentSuccess = () => {
 
         // Get transaction_id from URL parameters
         const params = new URLSearchParams(location.search);
-        const transaction_id = params.get("transaction_id");
+        let transaction_id = params.get("transaction_id");
         const cardBrand = params.get("cardbrand");
         const cardLastFour = params.get("cardlastfour");
+
+        // If no transaction_id in URL, try to get it from localStorage
+        if (!transaction_id) {
+          transaction_id = localStorage.getItem("transactionId");
+          console.log(
+            "PaymentSuccess: Retrieved transaction_id from localStorage:",
+            transaction_id
+          );
+        }
 
         console.log("PaymentSuccess: Extracted parameters:", {
           transaction_id,
