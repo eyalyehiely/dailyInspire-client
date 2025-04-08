@@ -37,6 +37,13 @@ const PaymentSuccess = () => {
         const cardBrand = params.get("cardbrand");
         const cardLastFour = params.get("cardlastfour");
 
+        console.log("PaymentSuccess: Extracted parameters:", {
+          transaction_id,
+          cardBrand,
+          cardLastFour,
+          allParams: Object.fromEntries(params.entries()),
+        });
+
         if (!transaction_id) {
           console.error("PaymentSuccess: No transaction_id found");
           setError(
@@ -44,6 +51,13 @@ const PaymentSuccess = () => {
           );
           setLoading(false);
           return;
+        }
+
+        if (!cardBrand || !cardLastFour) {
+          console.warn("PaymentSuccess: Missing card information:", {
+            cardBrand,
+            cardLastFour,
+          });
         }
 
         console.log("PaymentSuccess: Starting payment verification process...");

@@ -95,8 +95,6 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               console.log('PaddleProvider: Raw card info:', cardInfo);
               const cardBrand = cardInfo?.type || '';
               const cardLastFour = cardInfo?.last4 || '';
-              localStorage.setItem('cardBrand', cardBrand);
-              localStorage.setItem('cardLastFour', cardLastFour);
               console.log('PaddleProvider: Extracted card details:', { cardBrand, cardLastFour });
               
               // Make API call to our backend to verify transaction
@@ -110,8 +108,8 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                       'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     params: {
-                      cardBrand,
-                      cardLastFour
+                      cardbrand: cardBrand,
+                      cardlastfour: cardLastFour
                     }
                   }
                 );
