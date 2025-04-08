@@ -101,7 +101,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               try {
                 console.log('PaddleProvider: Verifying transaction through backend');
                 const response = await axios.get(
-                  `${import.meta.env.VITE_BASE_API}/api/payments/verify-transaction/${transactionId}?cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`,
+                  `${import.meta.env.VITE_BASE_API}/api/payments/verify-transaction/${transactionId}?cardBrand=${cardBrand}&cardLastFour=${cardLastFour}`,
                   {
                     headers: {
                       'Content-Type': 'application/json',

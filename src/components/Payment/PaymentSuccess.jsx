@@ -78,7 +78,7 @@ const PaymentSuccess = () => {
             const response = await axios.get(
               `${
                 import.meta.env.VITE_BASE_API
-              }/payments/verify-transaction/${transaction_id}?cardbrand=${cardBrand}&cardlastfour=${cardLastFour}`,
+              }/payments/verify-transaction/${transaction_id}?cardBrand=${cardBrand}&cardLastFour=${cardLastFour}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
