@@ -109,7 +109,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     },
                     params: {
                       cardBrand: cardBrand,
-                      cardlastfour: cardLastFour
+                      cardLastFour: cardLastFour
                     }
                   }
                 );

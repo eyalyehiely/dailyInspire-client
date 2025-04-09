@@ -35,7 +35,7 @@ const PaymentSuccess = () => {
         const params = new URLSearchParams(location.search);
         let transaction_id = params.get("transaction_id");
         const cardBrand = params.get("cardBrand");
-        const cardLastFour = params.get("cardlastfour");
+        const cardLastFour = params.get("cardLastFour");
 
         // If no transaction_id in URL, try to get it from localStorage
         if (!transaction_id) {
