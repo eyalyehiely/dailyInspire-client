@@ -108,7 +108,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                       'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     params: {
-                      cardbrand: cardBrand,
+                      cardBrand: cardBrand,
                       cardlastfour: cardLastFour
                     }
                   }
@@ -119,20 +119,20 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 if (response.data.message === 'Transaction verified successfully') {
                   console.log('PaddleProvider: Transaction verified successfully');
                   // Redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardBrand=${encodeURIComponent(cardBrand)}&cardLastFour=${encodeURIComponent(cardLastFour)}`;
                   console.log('PaddleProvider: Redirecting to success URL:', successUrl);
                   window.location.href = successUrl;
                 } else {
                   console.error('PaddleProvider: Transaction verification failed:', response.data.message);
                   // Still redirect to success page with transaction ID
-                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardBrand=${encodeURIComponent(cardBrand)}&cardLastFour=${encodeURIComponent(cardLastFour)}`;
                   console.log('PaddleProvider: Redirecting to success URL (verification failed):', successUrl);
                   window.location.href = successUrl;
                 }
               } catch (error) {
                 console.error('PaddleProvider: Error verifying transaction:', error);
                 // Still redirect to success page with transaction ID
-                const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardbrand=${encodeURIComponent(cardBrand)}&cardlastfour=${encodeURIComponent(cardLastFour)}`;
+                  const successUrl = `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(transactionId)}&cardBrand=${encodeURIComponent(cardBrand)}&cardLastFour=${encodeURIComponent(cardLastFour)}`;
                 console.log('PaddleProvider: Redirecting to success URL (error):', successUrl);
                 window.location.href = successUrl;
               }
@@ -183,7 +183,7 @@ export const PaddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           theme: 'light',
           displayMode: 'overlay',
           locale: 'en',
-          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(localStorage.getItem('transactionId') || '')}&cardbrand=${encodeURIComponent(localStorage.getItem('cardBrand') || '')}&cardlastfour=${encodeURIComponent(localStorage.getItem('cardLastFour') || '')}`,
+          successUrl: `${import.meta.env.VITE_APP_URL}/payment-success?t=${Date.now()}&transaction_id=${encodeURIComponent(localStorage.getItem('transactionId') || '')}&cardBrand=${encodeURIComponent(localStorage.getItem('cardBrand') || '')}&cardLastFour=${encodeURIComponent(localStorage.getItem('cardLastFour') || '')}`,
           closeCallback: function() {
             console.log('PaddleProvider: Checkout closed');
           }
